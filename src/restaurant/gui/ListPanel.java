@@ -4,6 +4,7 @@ import restaurant.CustomerAgent;
 import restaurant.HostAgent;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
@@ -19,9 +20,13 @@ public class ListPanel extends JPanel implements ActionListener {
             new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     private JPanel view = new JPanel();
+    JPanel opanel = new JPanel();
+
     private List<JButton> list = new ArrayList<JButton>();
     private JButton addPersonB = new JButton("Add");
-
+   // private JPanel opanel;
+    private JTextField namebox; 
+    private JCheckBox newCB;
     private RestaurantPanel restPanel;
     private String type;
 
@@ -34,6 +39,7 @@ public class ListPanel extends JPanel implements ActionListener {
     public ListPanel(RestaurantPanel rp, String type) {
         restPanel = rp;
         this.type = type;
+        
 
         setLayout(new BoxLayout((Container) this, BoxLayout.Y_AXIS));
         add(new JLabel("<html><pre> <u>" + type + "</u><br></pre></html>"));
@@ -43,7 +49,22 @@ public class ListPanel extends JPanel implements ActionListener {
 
         view.setLayout(new BoxLayout((Container) view, BoxLayout.Y_AXIS));
         pane.setViewportView(view);
+        
+        namebox = new JTextField("");
+        namebox.setPreferredSize( new Dimension(100,24));
+        opanel.add(namebox);
+        opanel.setMaximumSize(new Dimension (300,250));
+        newCB =new JCheckBox();
+        newCB.addActionListener(this);
+        newCB.setText("Hungry?");
+        opanel.add(newCB);
+        add(opanel);
         add(pane);
+        
+        namebox.setHorizontalAlignment(JTextField.LEFT);
+       
+				
+		
     }
 
     /**
@@ -51,19 +72,22 @@ public class ListPanel extends JPanel implements ActionListener {
      * Handles the event of the add button being pressed
      */
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == addPersonB) {
-        	// Chapter 2.19 describes showInputDialog()
-            addPerson(JOptionPane.showInputDialog("Please enter a name:"));
-        }
-        else {
-        	// Isn't the second for loop more beautiful?
-            /*for (int i = 0; i < list.size(); i++) {
-                JButton temp = list.get(i);*/
-        	for (JButton temp:list){
-                if (e.getSource() == temp)
-                    restPanel.showInfo(type, temp.getText());
-            }
-        }
+    	 if (e.getSource() == addPersonB) {
+         	// Chapter 2.19 describes showInputDialog()
+             addPerson(namebox.getText(), newCB.isSelected());
+             namebox.setText("");
+             newCB.setSelected(false);
+             		
+         }
+         else {
+         	// Isn't the second for loop more beautiful?
+             /*for (int i = 0; i < list.size(); i++) {
+                 JButton temp = list.get(i);*/
+         	for (JButton temp:list){
+                 if (e.getSource() == temp)
+                     restPanel.showInfo(type, temp.getText());
+             }
+         }
     }
 
     /**
@@ -73,7 +97,7 @@ public class ListPanel extends JPanel implements ActionListener {
      *
      * @param name name of new person
      */
-    public void addPerson(String name) {
+    public void addPerson(String name, boolean hungry) {
         if (name != null) {
             JButton button = new JButton(name);
             button.setBackground(Color.white);
@@ -87,7 +111,7 @@ public class ListPanel extends JPanel implements ActionListener {
             button.addActionListener(this);
             list.add(button);
             view.add(button);
-            restPanel.addPerson(type, name);//puts customer on list
+            restPanel.addPerson(type, name, hungry);//puts customer on list
             restPanel.showInfo(type, name);//puts hungry button on panel
             validate();
         }

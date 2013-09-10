@@ -25,6 +25,7 @@ public class RestaurantGui extends JFrame implements ActionListener {
     
     /* infoPanel holds information about the clicked customer, if there is one*/
     private JPanel infoPanel;
+    private JLabel glabel;
     private JLabel infoLabel; //part of infoPanel
     private JCheckBox stateCB;//part of infoLabel
 
@@ -44,16 +45,18 @@ public class RestaurantGui extends JFrame implements ActionListener {
         animationFrame.setVisible(true);
     	animationFrame.add(animationPanel); 
     	
+    	JFrame frame = new JFrame ("whatever");
+    	JPanel panel = new JPanel ();
     	setBounds(50, 50, WINDOWX, WINDOWY);
-
-        setLayout(new BoxLayout((Container) getContentPane(), 
-        		BoxLayout.Y_AXIS));
+setLayout(new BorderLayout());
+        //setLayout(new BoxLayout((Container) getContentPane(), 
+        	//	BoxLayout.Y_AXIS));
 
         Dimension restDim = new Dimension(WINDOWX, (int) (WINDOWY * .6));
         restPanel.setPreferredSize(restDim);
         restPanel.setMinimumSize(restDim);
         restPanel.setMaximumSize(restDim);
-        add(restPanel);
+        frame.add(restPanel, BorderLayout.NORTH);
         
         // Now, setup the info panel
         Dimension infoDim = new Dimension(WINDOWX, (int) (WINDOWY * .25));
@@ -73,7 +76,18 @@ public class RestaurantGui extends JFrame implements ActionListener {
         infoLabel.setText("<html><pre><i>Click Add to make customers</i></pre></html>");
         infoPanel.add(infoLabel);
         infoPanel.add(stateCB);
-        add(infoPanel);
+       frame.add(infoPanel);
+       // frame.add(panel);
+       
+       
+       ImageIcon image =  new ImageIcon ("C:/Users/Lenovo/Desktop/game/medusa.png");
+       
+       glabel = new JLabel();
+       glabel.setIcon(image);
+     //glabel.setText("okokok");
+      frame.add(glabel, BorderLayout.SOUTH);
+        frame.pack();
+        frame.setVisible(true);
     }
     /**
      * updateInfoPanel() takes the given customer (or, for v3, Host) object and
@@ -132,9 +146,9 @@ public class RestaurantGui extends JFrame implements ActionListener {
      */
     public static void main(String[] args) {
         RestaurantGui gui = new RestaurantGui();
-        gui.setTitle("csci201 Restaurant");
-        gui.setVisible(true);
-        gui.setResizable(false);
-        gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+       // gui.setTitle("csci201 Restaurant");
+       // gui.setVisible(true);
+        //gui.setResizable(false);
+        //gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }
