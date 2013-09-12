@@ -11,6 +11,9 @@ import java.util.TimerTask;
  * Restaurant customer agent.
  */
 public class CustomerAgent extends Agent {
+	
+	
+	private int tnum;
 	private String name;
 	private int hungerLevel = 5;        // determines length of meal
 	Timer timer = new Timer();
@@ -57,10 +60,11 @@ public class CustomerAgent extends Agent {
 		stateChanged();
 	}
 
-	public void msgSitAtTable() {
+	public void msgSitAtTable(int a) {
 		print("Received msgSitAtTable");
 		event = AgentEvent.followHost;
 		stateChanged();
+		tnum=a;
 	}
 
 	public void msgAnimationFinishedGoToSeat() {
@@ -118,7 +122,7 @@ public class CustomerAgent extends Agent {
 
 	private void SitDown() {
 		Do("Being seated. Going to table");
-		customerGui.DoGoToSeat(1);//hack; only one table
+		customerGui.DoGoToSeat(tnum);//hack; only one table
 	}
 
 	private void EatFood() {

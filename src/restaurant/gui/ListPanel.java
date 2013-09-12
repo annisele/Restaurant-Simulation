@@ -52,6 +52,7 @@ public class ListPanel extends JPanel implements ActionListener {
         
         namebox = new JTextField("");
         namebox.setPreferredSize( new Dimension(100,24));
+      
         opanel.add(namebox);
         opanel.setMaximumSize(new Dimension (300,250));
         newCB =new JCheckBox();

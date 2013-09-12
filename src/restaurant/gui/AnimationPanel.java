@@ -2,6 +2,8 @@ package restaurant.gui;
 
 import javax.swing.*;
 
+import restaurant.HostAgent;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,7 +20,7 @@ public class AnimationPanel extends JPanel implements ActionListener {
     private Dimension bufferSize;
 
     private List<Gui> guis = new ArrayList<Gui>();
-
+  
     public AnimationPanel() {
     	setSize(WINDOWX, WINDOWY);
         setVisible(true);
@@ -41,9 +43,14 @@ public class AnimationPanel extends JPanel implements ActionListener {
         g2.fillRect(0, 0, WINDOWX, WINDOWY );
 
         //Here is the table
+        
+        
         g2.setColor(Color.ORANGE);
         g2.fillRect(xloc, yloc, rectsize, rectsize);//200 and 250 need to be table params
-
+        g2.setColor(Color.ORANGE);
+        g2.fillRect(xloc+100, yloc, rectsize, rectsize);
+        g2.setColor(Color.ORANGE);
+        g2.fillRect(xloc+200, yloc, rectsize, rectsize);
 
         for(Gui gui : guis) {
             if (gui.isPresent()) {
