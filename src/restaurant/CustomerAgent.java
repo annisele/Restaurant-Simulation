@@ -1,9 +1,10 @@
 package restaurant;
 
+import restaurant.WaiterAgent.mycustomer;
 import restaurant.gui.CustomerGui;
-import restaurant.gui.RestaurantGui;
 import agent.Agent;
 
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -14,21 +15,23 @@ public class CustomerAgent extends Agent {
 	
 	
 	private int tnum;
-	private String name;
+	private String name, choice;
 	private int hungerLevel = 5;        // determines length of meal
 	Timer timer = new Timer();
 	private CustomerGui customerGui;
+	
 
 	// agent correspondents
 	private HostAgent host;
+	private WaiterAgent waiter;
 
 	//    private boolean isHungry = false; //hack for gui
 	public enum AgentState
-	{DoingNothing, WaitingInRestaurant, BeingSeated, Seated, Eating, DoneEating, Leaving};
+	{DoingNothing, WaitingInRestaurant, BeingSeated, Seated, WaitingForWaiter, WaitingForFood, Eating, DoneEating, Leaving};
 	private AgentState state = AgentState.DoingNothing;//The start state
 
 	public enum AgentEvent 
-	{none, gotHungry, followHost, seated, doneEating, doneLeaving};
+	{none, gotHungry, followWaiter, seated, readytoOrder, ordered,gotFood, doneEating, doneLeaving};
 	AgentEvent event = AgentEvent.none;
 
 	/**
@@ -45,6 +48,9 @@ public class CustomerAgent extends Agent {
 	/**
 	 * hack to establish connection to Host agent.
 	 */
+	public void setWaiter(WaiterAgent waitr) {
+		this.waiter = waitr;
+	}
 	public void setHost(HostAgent host) {
 		this.host = host;
 	}
@@ -60,9 +66,10 @@ public class CustomerAgent extends Agent {
 		stateChanged();
 	}
 
-	public void msgSitAtTable(int a) {
+	public void msgSitAtTable(WaiterAgent w, int a) {
 		print("Received msgSitAtTable");
-		event = AgentEvent.followHost;
+		waiter=w;
+		event = AgentEvent.followWaiter;
 		stateChanged();
 		tnum=a;
 	}
@@ -72,12 +79,21 @@ public class CustomerAgent extends Agent {
 		event = AgentEvent.seated;
 		stateChanged();
 	}
+	public void msgWhatsYourOrder(){
+		event = AgentEvent.ordered;
+		stateChanged();
+	}
+	public void msgFoodIsHere(){
+		event = AgentEvent.gotFood;
+		stateChanged();
+	}
 	public void msgAnimationFinishedLeaveRestaurant() {
 		//from animation
 		event = AgentEvent.doneLeaving;
 		stateChanged();
 	}
-
+	
+	
 	/**
 	 * Scheduler.  Determine what action is called for, and do it.
 	 */
@@ -89,17 +105,32 @@ public class CustomerAgent extends Agent {
 			goToRestaurant();
 			return true;
 		}
-		if (state == AgentState.WaitingInRestaurant && event == AgentEvent.followHost ){
+		if (state == AgentState.WaitingInRestaurant && event == AgentEvent.followWaiter ){
 			state = AgentState.BeingSeated;
 			SitDown();
 			return true;
 		}
 		if (state == AgentState.BeingSeated && event == AgentEvent.seated){
+			state = AgentState.Seated;
+			LookingAtMenu();
+			return true;
+		}
+		if (state == AgentState.Seated && event == AgentEvent.readytoOrder){
+			state = AgentState.WaitingForWaiter;
+			CallWaiter();
+			return true;
+		}
+		if (state ==  AgentState.WaitingForWaiter && event == AgentEvent.ordered){
+			state = AgentState.WaitingForFood;
+			choice=g_choice();
+			Order(choice);
+			return true;
+		}
+		if (state == AgentState.WaitingForFood && event == AgentEvent.gotFood){
 			state = AgentState.Eating;
 			EatFood();
 			return true;
 		}
-
 		if (state == AgentState.Eating && event == AgentEvent.doneEating){
 			state = AgentState.Leaving;
 			leaveTable();
@@ -118,13 +149,45 @@ public class CustomerAgent extends Agent {
 	private void goToRestaurant() {
 		Do("Going to restaurant");
 		host.msgIWantFood(this);//send our instance, so he can respond to us
+		
 	}
 
 	private void SitDown() {
 		Do("Being seated. Going to table");
 		customerGui.DoGoToSeat(tnum);//hack; only one table
 	}
-
+	private void LookingAtMenu(){
+		Do("Looking at Menu");
+		timer.schedule(new TimerTask(){
+			Object cookie = 1;
+			public void run() {
+				event = AgentEvent.readytoOrder;
+				stateChanged();
+			}
+		}, 5000);
+	}
+	private void CallWaiter(){
+		Do("Call Waiter");
+		waiter.msgReadyToOrder(this);
+	}
+	private String g_choice(){
+		Random g = new Random();
+		int i = g.nextInt(4);
+		if (i==0)
+			choice="steak";
+		if (i==1)
+			choice="chicken";
+		if (i==2)
+			choice="salad";
+		if (i==3)
+			choice="pizza";
+		return choice;
+		
+	}
+	private void Order (String ch){
+		Do("Order "+ch);
+		waiter.msgHereIsMyChoice(this, ch);
+	}
 	private void EatFood() {
 		Do("Eating Food");
 		//This next complicated line creates and starts a timer thread.
@@ -146,17 +209,22 @@ public class CustomerAgent extends Agent {
 		},
 		5000);//getHungerLevel() * 1000);//how long to wait before running task
 	}
-
+	
 	private void leaveTable() {
 		Do("Leaving.");
 		host.msgLeavingTable(this);
 		customerGui.DoExitRestaurant();
+		event = AgentEvent.doneLeaving;
 	}
 
 	// Accessors, etc.
 
 	public String getName() {
 		return name;
+	}
+	
+	public static mycustomer find(CustomerAgent c) {
+		return null;
 	}
 	
 	public int getHungerLevel() {
@@ -180,5 +248,48 @@ public class CustomerAgent extends Agent {
 	public CustomerGui getGui() {
 		return customerGui;
 	}
+
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

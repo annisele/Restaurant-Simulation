@@ -1,6 +1,7 @@
 package restaurant.gui;
 
 import restaurant.CustomerAgent;
+import restaurant.WaiterAgent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,10 +41,10 @@ public class RestaurantGui extends JFrame implements ActionListener {
         int WINDOWX = 450;
         int WINDOWY = 350;
 
-        animationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        animationFrame.setBounds(100+WINDOWX, 50 , WINDOWX+100, WINDOWY+100);
-        animationFrame.setVisible(true);
-    	animationFrame.add(animationPanel); 
+       // animationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //animationFrame.setBounds(100+WINDOWX, 50 , WINDOWX+100, WINDOWY+100);
+       // animationFrame.setVisible(true);
+    	//animationFrame.add(animationPanel); 
     	
     	JFrame frame = new JFrame ("whatever");
     	JPanel panel = new JPanel ();
@@ -77,15 +78,17 @@ setLayout(new BorderLayout());
         infoPanel.add(infoLabel);
         infoPanel.add(stateCB);
        frame.add(infoPanel);
-       // frame.add(panel);
+       Dimension aniDim = new Dimension(WINDOWX, WINDOWY);
+       animationPanel.setPreferredSize(aniDim);
+       frame.add(animationPanel,BorderLayout.SOUTH);
        
        
-       ImageIcon image =  new ImageIcon ("C:/Users/Lenovo/Desktop/game/medusa.png");
+     //  ImageIcon image =  new ImageIcon ("C:/Users/Lenovo/Desktop/game/medusa.png");
        
-       glabel = new JLabel();
-       glabel.setIcon(image);
+       //glabel = new JLabel();
+      // glabel.setIcon(image);
      //glabel.setText("okokok");
-      frame.add(glabel, BorderLayout.SOUTH);
+    //  frame.add(glabel, BorderLayout.SOUTH);
         frame.pack();
         frame.setVisible(true);
     }
@@ -109,6 +112,11 @@ setLayout(new BorderLayout());
           // Hack. Should ask customerGui
             infoLabel.setText(
                "<html><pre>     Name: " + customer.getName() + " </pre></html>");
+        }
+        if (person instanceof WaiterAgent) {
+            WaiterAgent waiter = (WaiterAgent) person;
+            infoLabel.setText(
+               "<html><pre>     Waiter: " + waiter.getName() + " </pre></html>");
         }
         infoPanel.validate();
     }

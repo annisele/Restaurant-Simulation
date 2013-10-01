@@ -1,6 +1,7 @@
 package restaurant;
 
 import agent.Agent;
+import restaurant.WaiterAgent.mycustomer;
 import restaurant.gui.HostGui;
 
 import java.util.*;
@@ -17,12 +18,15 @@ public class HostAgent extends Agent {
 	static final int NTABLES = 3;//a global for the number of tables.
 	//Notice that we implement waitingCustomers using ArrayList, but type it
 	//with List semantics.
+	public int waiternum;
 	public List<CustomerAgent> waitingCustomers
 	= new ArrayList<CustomerAgent>();
+	public List<WaiterAgent> waiters
+	= new ArrayList<WaiterAgent>();
 	public Collection<Table> tables;
 	//note that tables is typed with Collection semantics.
 	//Later we will see how it is implemented
-
+    private int currentwaiter=0;
 	private String name;
 	private Semaphore atTable = new Semaphore(0,true);
 
@@ -60,23 +64,21 @@ public class HostAgent extends Agent {
 	public void msgIWantFood(CustomerAgent cust) {
 		waitingCustomers.add(cust);
 		stateChanged();
+		Do(cust.getName());
+	
 	}
 
 	public void msgLeavingTable(CustomerAgent cust) {
-		for (Table table : tables) {
-			if (table.getOccupant() == cust) {
-				print(cust + " leaving " + table);
-				table.setUnoccupied();
+		for(Table t:tables){
+			if(t.getOccupant()==cust){
+				print(cust + " leaving " + t);
+				t.setUnoccupied();
 				stateChanged();
 			}
 		}
+	
 	}
 
-	public void msgAtTable() {//from animation
-		//print("msgAtTable() called");
-		atTable.release();// = true;
-		stateChanged();
-	}
 
 	/**
 	 * Scheduler.  Determine what action is called for, and do it.
@@ -90,12 +92,19 @@ public class HostAgent extends Agent {
 		for (Table table : tables) {
 			if (!table.isOccupied()) {
 				if (!waitingCustomers.isEmpty()) {
-					seatCustomer(waitingCustomers.get(0), table);//the action
+					if(!waiters.isEmpty()){
+					
+					
+					assignWaiter(waitingCustomers.get(0),  table);//the action
+					
+					
 					return true;//return true to the abstract agent to reinvoke the scheduler.
 				}
+					else
+						return true;
 			}
 		}
-
+		}
 		return false;
 		//we have tried all our rules and found
 		//nothing to do. So return false to main loop of abstract agent
@@ -104,36 +113,21 @@ public class HostAgent extends Agent {
 
 	// Actions
 
-	private void seatCustomer(CustomerAgent customer, Table table) {
-		int tablenum2= table.tableNumber;
-		customer.msgSitAtTable(tablenum2);
-		DoSeatCustomer(customer, table);
+	private void assignWaiter(CustomerAgent customer,  Table t) {
+		//msgsitattable to waiter include tablenum 
+		Do("assign");
+		WaiterAgent w= waiters.get(currentwaiter);
+	
+		w.msgSeatCustomer(customer, t.tableNumber);
+		currentwaiter++;
+		if(currentwaiter>=waiters.size())
+			currentwaiter=0;
 		
-		try {
-			atTable.acquire();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		table.setOccupant(customer);
+		t.setOccupant(customer);
 		waitingCustomers.remove(customer);
-		hostGui.DoLeaveCustomer();
 	}
 
-	// The animation DoXYZ() routines
-	private void DoSeatCustomer(CustomerAgent customer, Table table) {
-		//Notice how we print "customer" directly. It's toString method will do it.
-		//Same with "table"
-		int tnum=tables.size();
-		int []tablelist = new int[tnum];
-		tablelist[0]=200;
-		tablelist[1]=300;
-		tablelist[2]=400;
-		int tablenum= table.tableNumber;
-		print("Seating " + customer + " at " + table);
-		hostGui.DoBringToTable(customer, tablenum, tablelist); 
-
-	}
+	
 
 	//utilities
 
@@ -144,7 +138,10 @@ public class HostAgent extends Agent {
 	public HostGui getGui() {
 		return hostGui;
 	}
-
+	
+	public void addWaiter(WaiterAgent we){
+		waiters.add(we);
+	}
 	private class Table {
 		CustomerAgent occupiedBy;
 		int tableNumber;
@@ -173,5 +170,37 @@ public class HostAgent extends Agent {
 			return "table " + tableNumber;
 		}
 	}
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class AnimationPanel extends JPanel implements ActionListener {
-	static final int xloc =200;
-	static final int yloc =250;
+	static final int xloc =100;
+	static final int yloc =150;
 	static final int rectsize =50;
     private final int WINDOWX = 450;
     private final int WINDOWY = 350;
@@ -72,4 +72,8 @@ public class AnimationPanel extends JPanel implements ActionListener {
     public void addGui(HostGui gui) {
         guis.add(gui);
     }
+    public void addGui(WaiterGui gui) {
+        guis.add(gui);
+    }
+
 }

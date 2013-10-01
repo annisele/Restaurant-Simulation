@@ -23,7 +23,8 @@ public class ListPanel extends JPanel implements ActionListener {
     JPanel opanel = new JPanel();
 
     private List<JButton> list = new ArrayList<JButton>();
-    private JButton addPersonB = new JButton("Add");
+    private JButton addPersonB = new JButton("Add Customer");
+    private JButton addWaiter = new JButton("Add Waiter");
    // private JPanel opanel;
     private JTextField namebox; 
     private JCheckBox newCB;
@@ -46,6 +47,8 @@ public class ListPanel extends JPanel implements ActionListener {
 
         addPersonB.addActionListener(this);
         add(addPersonB);
+        addWaiter.addActionListener(this);
+        add(addWaiter);
 
         view.setLayout(new BoxLayout((Container) view, BoxLayout.Y_AXIS));
         pane.setViewportView(view);
@@ -75,11 +78,17 @@ public class ListPanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
     	 if (e.getSource() == addPersonB) {
          	// Chapter 2.19 describes showInputDialog()
-             addPerson(namebox.getText(), newCB.isSelected());
+             addPerson("Customers", namebox.getText(), newCB.isSelected());
              namebox.setText("");
              newCB.setSelected(false);
              		
          }
+    	 if (e.getSource() == addWaiter) {
+          	// Chapter 2.19 describes showInputDialog()
+              addPerson("Waiter", namebox.getText(), newCB.isSelected());
+              namebox.setText("");
+              newCB.setSelected(false);  		
+          }
          else {
          	// Isn't the second for loop more beautiful?
              /*for (int i = 0; i < list.size(); i++) {
@@ -98,7 +107,7 @@ public class ListPanel extends JPanel implements ActionListener {
      *
      * @param name name of new person
      */
-    public void addPerson(String name, boolean hungry) {
+    public void addPerson(String type, String name, boolean hungry) {
         if (name != null) {
             JButton button = new JButton(name);
             button.setBackground(Color.white);

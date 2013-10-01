@@ -2,8 +2,12 @@ package restaurant.gui;
 
 import restaurant.CustomerAgent;
 import restaurant.HostAgent;
+import restaurant.WaiterAgent;
+import restaurant.CookAgent;
+import restaurant.CustomerAgent.AgentState;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
@@ -16,23 +20,32 @@ public class RestaurantPanel extends JPanel {
 
     //Host, cook, waiters and customers
     private HostAgent host = new HostAgent("Sarah");
+    private CookAgent cook = new CookAgent();
     private HostGui hostGui = new HostGui(host);
-
+   
     private Vector<CustomerAgent> customers = new Vector<CustomerAgent>();
+    private Vector<WaiterAgent> waiters = new Vector<WaiterAgent>();
 
     private JPanel restLabel = new JPanel();
     private ListPanel customerPanel = new ListPanel(this, "Customers");
     private JPanel group = new JPanel();
+    private String type;
 
     private RestaurantGui gui; //reference to main gui
 
     public RestaurantPanel(RestaurantGui gui) {
         this.gui = gui;
+        
         host.setGui(hostGui);
+       
 
         gui.animationPanel.addGui(hostGui);
+       
         host.startThread();
-
+        cook.startThread();
+        /*this.addPerson("Waiter", "waiter 1", false);
+        this.addPerson("Waiter", "waiter 2", false);
+        this.addPerson("Waiter", "waiter 3", false);*/
         setLayout(new GridLayout(1, 2, 20, 20));
         group.setLayout(new GridLayout(1, 2, 10, 10));
 
@@ -67,13 +80,23 @@ public class RestaurantPanel extends JPanel {
      *
      * @param type indicates whether the person is a customer or waiter
      * @param name name of person
+     * 
      */
+   
     public void showInfo(String type, String name) {
 
         if (type.equals("Customers")) {
 
             for (int i = 0; i < customers.size(); i++) {
                 CustomerAgent temp = customers.get(i);
+                if (temp.getName() == name)
+                    gui.updateInfoPanel(temp);
+            }
+        }
+        if (type.equals("Waiter")) {
+
+            for (int i = 0; i < waiters.size(); i++) {
+                WaiterAgent temp = waiters.get(i);
                 if (temp.getName() == name)
                     gui.updateInfoPanel(temp);
             }
@@ -91,6 +114,7 @@ public class RestaurantPanel extends JPanel {
     	if (type.equals("Customers")) {
     		CustomerAgent c = new CustomerAgent(name);	
     		CustomerGui g = new CustomerGui(c, gui);
+    		//WaiterAgent w = new WaiterAgent(name);	
 
     		gui.animationPanel.addGui(g);// dw
     		c.setHost(host);
@@ -101,7 +125,22 @@ public class RestaurantPanel extends JPanel {
     		}
     		c.startThread();
     	}
-    }
-
     
+    if (type.equals("Waiter")) {
+    	
+		WaiterAgent w = new WaiterAgent(name);	
+		WaiterGui g = new WaiterGui(w, gui);
+
+		gui.animationPanel.addGui(g);// dw
+		w.setHost(host);
+		w.setCook(cook);
+		w.setGui(g);
+		waiters.add(w);
+		host.addWaiter(w);
+	
+		w.startThread();
+	}
+}
+
+    //use same function for cook and waiter
 }
