@@ -41,8 +41,7 @@ public class RestaurantGui extends JFrame implements ActionListener {
         int WINDOWX = 450;
         int WINDOWY = 350;
 
-       // animationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //animationFrame.setBounds(100+WINDOWX, 50 , WINDOWX+100, WINDOWY+100);
+                //animationFrame.setBounds(100+WINDOWX, 50 , WINDOWX+100, WINDOWY+100);
        // animationFrame.setVisible(true);
     	//animationFrame.add(animationPanel); 
     	
@@ -52,12 +51,13 @@ public class RestaurantGui extends JFrame implements ActionListener {
 setLayout(new BorderLayout());
         //setLayout(new BoxLayout((Container) getContentPane(), 
         	//	BoxLayout.Y_AXIS));
+frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Dimension restDim = new Dimension(WINDOWX, (int) (WINDOWY * .6));
         restPanel.setPreferredSize(restDim);
         restPanel.setMinimumSize(restDim);
         restPanel.setMaximumSize(restDim);
-        frame.add(restPanel, BorderLayout.NORTH);
+        frame.add(restPanel, BorderLayout.WEST);
         
         // Now, setup the info panel
         Dimension infoDim = new Dimension(WINDOWX, (int) (WINDOWY * .25));
@@ -77,10 +77,10 @@ setLayout(new BorderLayout());
         infoLabel.setText("<html><pre><i>Click Add to make customers</i></pre></html>");
         infoPanel.add(infoLabel);
         infoPanel.add(stateCB);
-       frame.add(infoPanel);
+       frame.add(infoPanel,BorderLayout.SOUTH);
        Dimension aniDim = new Dimension(WINDOWX, WINDOWY);
        animationPanel.setPreferredSize(aniDim);
-       frame.add(animationPanel,BorderLayout.SOUTH);
+       frame.add(animationPanel,BorderLayout.EAST);
        
        
      //  ImageIcon image =  new ImageIcon ("C:/Users/Lenovo/Desktop/game/medusa.png");
@@ -115,6 +115,13 @@ setLayout(new BorderLayout());
         }
         if (person instanceof WaiterAgent) {
             WaiterAgent waiter = (WaiterAgent) person;
+            stateCB.setText("Go on Break????");
+            //Should checkmark be there?
+            stateCB.setEnabled(true);
+             stateCB.setSelected(false);
+            //Is customer hungry? Hack. Should ask customerGui
+          stateCB.validate();
+            // Hack. Should ask customerGui
             infoLabel.setText(
                "<html><pre>     Waiter: " + waiter.getName() + " </pre></html>");
         }
@@ -126,12 +133,19 @@ setLayout(new BorderLayout());
      * For v3, it will propose a break for the waiter.
      */
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == stateCB) {
-            if (currentPerson instanceof CustomerAgent) {
+        if (e.getSource() == stateCB && currentPerson instanceof CustomerAgent) {
+        		System.out.println("asd");
                 CustomerAgent c = (CustomerAgent) currentPerson;
                 c.getGui().setHungry();
                 stateCB.setEnabled(false);
-            }
+           
+        }
+        else {
+        		System.out.println("cde");
+                WaiterAgent w = (WaiterAgent) currentPerson;
+                w.getGui().setBreak();
+                stateCB.setEnabled(false);
+  
         }
     }
     /**
@@ -144,6 +158,15 @@ setLayout(new BorderLayout());
         if (currentPerson instanceof CustomerAgent) {
             CustomerAgent cust = (CustomerAgent) currentPerson;
             if (c.equals(cust)) {
+                stateCB.setEnabled(true);
+                stateCB.setSelected(false);
+            }
+        }
+    }
+        public void setWaiterEnabled(WaiterAgent w) {
+        if (currentPerson instanceof WaiterAgent) {
+            WaiterAgent wait = (WaiterAgent) currentPerson;
+            if (w.equals(wait)) {
                 stateCB.setEnabled(true);
                 stateCB.setSelected(false);
             }

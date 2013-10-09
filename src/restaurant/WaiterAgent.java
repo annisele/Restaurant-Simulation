@@ -30,7 +30,7 @@ private HostAgent host;
 private CookAgent cook;
 enum CustomerState{
 	waiting,seated,asked, readytoorder, askedtoorder,ordered, 
-	waitingfororder, waitingforfood, eating, leaving;
+	waitingfororder, mustreorder, pend, waitingforfood, eating, leaving;
 }
 class mycustomer {
 	CustomerAgent c;
@@ -51,6 +51,7 @@ class mycustomer {
 	private Semaphore atTable = new Semaphore(0,true);
 	private Semaphore waitForOrder =new Semaphore(0,true);
 	public boolean w_at_table;
+	private boolean WantToGoOnBreak=false;
 
 	public WaiterGui waiterGui = null;
 
@@ -80,6 +81,11 @@ class mycustomer {
 		this.cook = cook;
 	}
 	// Messages
+	public void wantsaBreak(){
+		Do("waiter wants break");
+		WantToGoOnBreak=true;
+		waiterGui.DoLeaveCustomer();
+	}
  
 	public void msgSeatCustomer(CustomerAgent c, int table_num){
 		Do("Recieved msg seat cust");
@@ -118,7 +124,8 @@ class mycustomer {
 			if (customers.get(i).c == c){
 				customers.get(i).state=CustomerState.ordered;
 				customers.get(i).choice=choice;
-					stateChanged();
+				Do("here");
+				stateChanged();
 				}
 		try {
 			atTable.acquire();
@@ -132,6 +139,17 @@ class mycustomer {
 		//w_at_table=false;
 		
 	}
+	}
+	
+	public void msgnofood(int table){
+		Do("recieved msg that food is unavailable");
+		waiterGui.DoBringToTable(table); 
+		for (int i = 0; i< customers.size();i++){
+			if(customers.get(i).table_num==table){
+				customers.get(i).state=CustomerState.mustreorder;
+				stateChanged();
+			}
+		}
 	}
 	public void msgFoodReady(int table){
 		Do("Recieved msg from cook that food is ready");
@@ -190,6 +208,20 @@ class mycustomer {
 					CallCook(c,c.table_num,c.choice);
 					return true;//return true to the abstract agent to reinvoke the scheduler.
 					}
+				if (c.state == CustomerState.mustreorder) {
+					if(w_at_table==true){
+					Do("customer must reorder");
+					//waiterGui.DoBringToTable( c.table_num);
+					c.c.msgReorder(c.table_num,c.choice);
+					c.state=CustomerState.pend;
+					return true;//return true to the abstract agent to reinvoke the scheduler.
+					}
+					else
+					{
+						waiterGui.DoBringToTable( c.table_num);
+						Do("walking");
+					}
+				}
 				if (c.state == CustomerState.waitingforfood) {
 					if(w_at_table==true){
 						Do("customer recieved order");

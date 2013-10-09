@@ -2,6 +2,7 @@ package restaurant.gui;
 
 import restaurant.CustomerAgent;
 import restaurant.HostAgent;
+import restaurant.WaiterAgent;
 
 import javax.swing.*;
 
@@ -22,7 +23,8 @@ public class ListPanel extends JPanel implements ActionListener {
     private JPanel view = new JPanel();
     JPanel opanel = new JPanel();
 
-    private List<JButton> list = new ArrayList<JButton>();
+    private List<JButton> waiterlist = new ArrayList<JButton>();
+    private List<JButton> customerlist = new ArrayList<JButton>();
     private JButton addPersonB = new JButton("Add Customer");
     private JButton addWaiter = new JButton("Add Waiter");
    // private JPanel opanel;
@@ -30,7 +32,28 @@ public class ListPanel extends JPanel implements ActionListener {
     private JCheckBox newCB;
     private RestaurantPanel restPanel;
     private String type;
-
+    /*
+    private List <customer>customers
+    = new ArrayList<customer>();
+    class customer {
+    	String name;
+    	String type="Customer";
+    	customer(String n){
+    		name=n;
+    		
+    	}
+    }
+    private List <waiter>waiters
+    = new ArrayList<waiter>();
+    class waiter {
+    	String name;
+    	String type="Waiter";
+    	waiter(String n){
+    		name=n;
+    		
+    	}
+    }
+    */
     /**
      * Constructor for ListPanel.  Sets up all the gui
      *
@@ -44,12 +67,14 @@ public class ListPanel extends JPanel implements ActionListener {
 
         setLayout(new BoxLayout((Container) this, BoxLayout.Y_AXIS));
         add(new JLabel("<html><pre> <u>" + type + "</u><br></pre></html>"));
-
+if(type=="Customer"){
         addPersonB.addActionListener(this);
         add(addPersonB);
+}
+if(type=="Waiter"){
         addWaiter.addActionListener(this);
         add(addWaiter);
-
+}
         view.setLayout(new BoxLayout((Container) view, BoxLayout.Y_AXIS));
         pane.setViewportView(view);
         
@@ -78,7 +103,8 @@ public class ListPanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
     	 if (e.getSource() == addPersonB) {
          	// Chapter 2.19 describes showInputDialog()
-             addPerson("Customers", namebox.getText(), newCB.isSelected());
+             addPerson("Customerz", namebox.getText(), newCB.isSelected());
+           
              namebox.setText("");
              newCB.setSelected(false);
              		
@@ -86,6 +112,7 @@ public class ListPanel extends JPanel implements ActionListener {
     	 if (e.getSource() == addWaiter) {
           	// Chapter 2.19 describes showInputDialog()
               addPerson("Waiter", namebox.getText(), newCB.isSelected());
+           
               namebox.setText("");
               newCB.setSelected(false);  		
           }
@@ -93,10 +120,16 @@ public class ListPanel extends JPanel implements ActionListener {
          	// Isn't the second for loop more beautiful?
              /*for (int i = 0; i < list.size(); i++) {
                  JButton temp = list.get(i);*/
-         	for (JButton temp:list){
+         	for (JButton temp:customerlist){
                  if (e.getSource() == temp)
-                     restPanel.showInfo(type, temp.getText());
+                	 System.out.println("here: "+type+" "+ temp.getText());
+                     restPanel.showInfo("Customerz", temp.getText());
              }
+         	for (JButton temp:waiterlist){
+                if (e.getSource() == temp)
+               	 System.out.println(type);
+                    restPanel.showInfo(type, temp.getText());
+            }
          }
     }
 
@@ -110,6 +143,8 @@ public class ListPanel extends JPanel implements ActionListener {
     public void addPerson(String type, String name, boolean hungry) {
         if (name != null) {
             JButton button = new JButton(name);
+           
+            
             button.setBackground(Color.white);
 
             Dimension paneSize = pane.getSize();
@@ -119,7 +154,14 @@ public class ListPanel extends JPanel implements ActionListener {
             button.setMinimumSize(buttonSize);
             button.setMaximumSize(buttonSize);
             button.addActionListener(this);
-            list.add(button);
+            if(type.equals("Customerz")){
+            customerlist.add(button);
+            System.out.println("herehhre");
+            }
+           if(type.equals("Waiter")){
+            waiterlist.add(button);
+            System.out.println("herehhre");
+            } 
             view.add(button);
             restPanel.addPerson(type, name, hungry);//puts customer on list
             restPanel.showInfo(type, name);//puts hungry button on panel

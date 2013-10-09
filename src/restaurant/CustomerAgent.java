@@ -27,11 +27,11 @@ public class CustomerAgent extends Agent {
 
 	//    private boolean isHungry = false; //hack for gui
 	public enum AgentState
-	{DoingNothing, WaitingInRestaurant, BeingSeated, Seated, WaitingForWaiter, WaitingForFood, Eating, DoneEating, Leaving};
+	{DoingNothing, WaitingInRestaurant, BeingSeated, Seated, WaitingForWaiter,  WaitingForFood, Eating, DoneEating, Leaving};
 	private AgentState state = AgentState.DoingNothing;//The start state
 
 	public enum AgentEvent 
-	{none, gotHungry, followWaiter, seated, readytoOrder, ordered,gotFood, doneEating, doneLeaving};
+	{none, gotHungry, followWaiter, seated, readytoOrder,x, ordered,gotFood, doneEating, doneLeaving};
 	AgentEvent event = AgentEvent.none;
 
 	/**
@@ -83,6 +83,17 @@ public class CustomerAgent extends Agent {
 		event = AgentEvent.ordered;
 		stateChanged();
 	}
+	public void msgReorder(int table, String c){
+		Do("recieved msg to reorder "+this.state);
+		event = AgentEvent.x;
+		Do("recieved msg to reorder "+this.event);
+		
+		String c_;
+		do {c_= g_choice();
+		}while(c_==c);
+		this.choice=c_;
+		stateChanged();
+	}
 	public void msgFoodIsHere(){
 		event = AgentEvent.gotFood;
 		stateChanged();
@@ -124,6 +135,13 @@ public class CustomerAgent extends Agent {
 			state = AgentState.WaitingForFood;
 			choice=g_choice();
 			Order(choice);
+			return true;
+		}
+
+		if (state ==  AgentState.WaitingForFood && event == AgentEvent.x){
+			//state= AgentState.BeingSeated;
+			Do("back to order");
+			Reorder();
 			return true;
 		}
 		if (state == AgentState.WaitingForFood && event == AgentEvent.gotFood){
@@ -186,7 +204,11 @@ public class CustomerAgent extends Agent {
 	}
 	private void Order (String ch){
 		Do("Order "+ch);
-		waiter.msgHereIsMyChoice(this, ch);
+		waiter.msgHereIsMyChoice(this, "chicken");
+	}
+	private void Reorder(){
+		Do("reOrder ");
+		waiter.msgHereIsMyChoice(this, this.choice);
 	}
 	private void EatFood() {
 		Do("Eating Food");

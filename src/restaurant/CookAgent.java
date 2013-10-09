@@ -18,6 +18,21 @@ public class CookAgent extends Agent {
 	
 	
 	private WaiterAgent waiter;
+	public class inventory{
+		int steak;
+		int chicken;
+		int salad;
+		int pizza;
+		
+		inventory( int st, int ch, int sa, int pi ){
+		steak=st;
+		chicken=ch;
+		salad=sa;
+		pizza=pi;
+		
+		}
+	}
+	public inventory v= new inventory(5,0,5,5);
 	public class order{
 		WaiterAgent w;
 		String choice;
@@ -33,11 +48,10 @@ public class CookAgent extends Agent {
 	}
 	public List <order> orders= new ArrayList<order>();
 	public enum OrderState
-	{ prep, cooking, done };
+	{ prep, notready, done };
 	public int num=0;
 	Timer timer = new Timer();
 	private boolean cooking=false;
-	
 	
 	public void setWaiter(WaiterAgent waitr) {
 		this.waiter = waitr;
@@ -47,15 +61,23 @@ public class CookAgent extends Agent {
 	public CookAgent(){
 		super();
 		cooking=false;
+		
 	}
 
 	public void msgCookOrder(WaiterAgent w, int tnum, String choice) {
 		Do("Recieve msg to cook order");
 		//waiter=w;
 		order o = new order (w,choice, tnum);
+		if(checkorder(choice)==true){
 		//o.state= OrderState.prep;
 		orders.add(o);
 		stateChanged();
+		}
+		else
+			o.state=OrderState.notready;
+			orders.add(o);
+			stateChanged();
+
 	}
 	public void msgFoodDone(order oo) {
 		oo.state= OrderState.done;
@@ -78,6 +100,12 @@ public class CookAgent extends Agent {
 				CookIt(o);
 				return true;
 			}
+			if (o.state == OrderState.notready) {
+				cooking= false;
+				Do("why");
+				notcool(o, o.table);
+				return true;
+			}
 			
 			if (o.state == OrderState.done) {
 				PlateIt(o);
@@ -91,9 +119,53 @@ public class CookAgent extends Agent {
 	}
 
 	// Actions
-
+	private boolean checkorder(String c){
+		if (c.equals( "chicken")) {
+			if (v.chicken!=0){
+			v.chicken--;
+			return true;
+			}
+			else
+				Do("HEYY");
+			return false;
+		}
+			
+		if (c== "steak"){
+			if (v.steak!=0){
+			v.steak--;
+			return true;
+		}
+		else
+			return false;
+		}
+			
+		if (c== "salad"){
+			if (v.salad!=0){
+			v.salad--;
+			return true;
+		}
+		else
+			return false;
+		}
+		if (c== "pizza"){
+			if (v.pizza!=0){
+			v.pizza--;
+			return true;
+		}
+		else
+			return false;
+		}
+		return false;
+	}
+	private void notcool(order o,int t){
+		Do("not cool");
+		setWaiter(o.w);
+		waiter.msgnofood(t);
+		orders.remove(o);
+	}
 	private void CookIt(order o){
-		find(o);
+		Do(""+o.choice);
+		num=find(o);
 		timer.schedule(new TimerTask(){
 			Object cookie = 1;
 			
@@ -106,13 +178,15 @@ public class CookAgent extends Agent {
 		}, 3000);
 		
 	}
-	private void find(order o){
+	private int find(order o){
 		
 		for(int i=0; i<orders.size();i++){
 			if( orders.get(i)==o){
-			num=i;
+			return i;
 			}
 		}
+		Do("WRONG");
+		return 0;
 	}
 	
 	private void PlateIt(order o){

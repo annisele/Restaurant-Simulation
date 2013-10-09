@@ -27,7 +27,9 @@ public class RestaurantPanel extends JPanel {
     private Vector<WaiterAgent> waiters = new Vector<WaiterAgent>();
 
     private JPanel restLabel = new JPanel();
-    private ListPanel customerPanel = new ListPanel(this, "Customers");
+    private ListPanel customerPanel = new ListPanel(this, "Customer");
+    private ListPanel waiterPanel = new ListPanel(this, "Waiter");
+    
     private JPanel group = new JPanel();
     private String type;
 
@@ -47,10 +49,10 @@ public class RestaurantPanel extends JPanel {
         this.addPerson("Waiter", "waiter 2", false);
         this.addPerson("Waiter", "waiter 3", false);*/
         setLayout(new GridLayout(1, 2, 20, 20));
-        group.setLayout(new GridLayout(1, 2, 10, 10));
+        group.setLayout(new GridLayout(2, 1, 10, 10));
 
         group.add(customerPanel);
-
+        group.add(waiterPanel);
         initRestLabel();
         add(restLabel);
         add(group);
@@ -85,21 +87,24 @@ public class RestaurantPanel extends JPanel {
    
     public void showInfo(String type, String name) {
 
-        if (type.equals("Customers")) {
-
+        if (type.equals("Customerz")) {
+        	System.out.println("CUST "+type+" "+name);
             for (int i = 0; i < customers.size(); i++) {
-                CustomerAgent temp = customers.get(i);
-                if (temp.getName() == name)
-                    gui.updateInfoPanel(temp);
+                if (customers.get(i).getName() == name)
+                	System.out.println("CUST processed");
+                    gui.updateInfoPanel(customers.get(i));
             }
         }
         if (type.equals("Waiter")) {
-
+        	System.out.println("WAIT");
             for (int i = 0; i < waiters.size(); i++) {
-                WaiterAgent temp = waiters.get(i);
-                if (temp.getName() == name)
-                    gui.updateInfoPanel(temp);
+               //WaiterAgent temp = waiters.get(i);
+                if (waiters.get(i).getName().equals(name)){
+                	System.out.println("WAIT processed");
+                    gui.updateInfoPanel(waiters.get(i));
+                }
             }
+           
         }
     }
 
@@ -111,7 +116,8 @@ public class RestaurantPanel extends JPanel {
      */
     public void addPerson(String type, String name, boolean hungry) {
 
-    	if (type.equals("Customers")) {
+    	if (type.equals("Customerz")) {
+    		System.out.println("add person- cust");
     		CustomerAgent c = new CustomerAgent(name);	
     		CustomerGui g = new CustomerGui(c, gui);
     		//WaiterAgent w = new WaiterAgent(name);	
@@ -127,7 +133,7 @@ public class RestaurantPanel extends JPanel {
     	}
     
     if (type.equals("Waiter")) {
-    	
+    	System.out.println("add person- waiter");
 		WaiterAgent w = new WaiterAgent(name);	
 		WaiterGui g = new WaiterGui(w, gui);
 
@@ -135,6 +141,7 @@ public class RestaurantPanel extends JPanel {
 		w.setHost(host);
 		w.setCook(cook);
 		w.setGui(g);
+		
 		waiters.add(w);
 		host.addWaiter(w);
 	
