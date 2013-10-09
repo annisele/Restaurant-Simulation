@@ -4,6 +4,7 @@ import restaurant.CustomerAgent;
 import restaurant.WaiterAgent;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 /**
@@ -101,10 +102,11 @@ frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     public void updateInfoPanel(Object person) {
         stateCB.setVisible(true);
         currentPerson = person;
-
+       
         if (person instanceof CustomerAgent) {
             CustomerAgent customer = (CustomerAgent) person;
             stateCB.setText("Hungry?");
+            System.out.println("HEY2"+customer.getName());
           //Should checkmark be there? 
             stateCB.setSelected(customer.getGui().isHungry());
           //Is customer hungry? Hack. Should ask customerGui

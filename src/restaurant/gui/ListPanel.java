@@ -103,7 +103,7 @@ if(type=="Waiter"){
     public void actionPerformed(ActionEvent e) {
     	 if (e.getSource() == addPersonB) {
          	// Chapter 2.19 describes showInputDialog()
-             addPerson("Customerz", namebox.getText(), newCB.isSelected());
+             addPerson( namebox.getText(), newCB.isSelected());
            
              namebox.setText("");
              newCB.setSelected(false);
@@ -111,19 +111,19 @@ if(type=="Waiter"){
          }
     	 if (e.getSource() == addWaiter) {
           	// Chapter 2.19 describes showInputDialog()
-              addPerson("Waiter", namebox.getText(), newCB.isSelected());
+              addPerson( namebox.getText(), newCB.isSelected());
            
               namebox.setText("");
               newCB.setSelected(false);  		
           }
-         else {
+    	 else {
          	// Isn't the second for loop more beautiful?
              /*for (int i = 0; i < list.size(); i++) {
                  JButton temp = list.get(i);*/
          	for (JButton temp:customerlist){
                  if (e.getSource() == temp)
                 	 System.out.println("here: "+type+" "+ temp.getText());
-                     restPanel.showInfo("Customerz", temp.getText());
+                     restPanel.showInfo("Customer", temp.getText());
              }
          	for (JButton temp:waiterlist){
                 if (e.getSource() == temp)
@@ -140,7 +140,7 @@ if(type=="Waiter"){
      *
      * @param name name of new person
      */
-    public void addPerson(String type, String name, boolean hungry) {
+    public void addPerson( String name, boolean hungry) {
         if (name != null) {
             JButton button = new JButton(name);
            
@@ -154,9 +154,8 @@ if(type=="Waiter"){
             button.setMinimumSize(buttonSize);
             button.setMaximumSize(buttonSize);
             button.addActionListener(this);
-            if(type.equals("Customerz")){
+            if(type.equals("Customer")){
             customerlist.add(button);
-            System.out.println("herehhre");
             }
            if(type.equals("Waiter")){
             waiterlist.add(button);
