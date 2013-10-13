@@ -48,7 +48,7 @@ public class CustomerGui implements Gui{
 			if (command==Command.GoToSeat) agent.msgAnimationFinishedGoToSeat();
 			else if (command==Command.LeaveRestaurant) {
 				agent.msgAnimationFinishedLeaveRestaurant();
-				System.out.println("about to call gui.setCustomerEnabled(agent);");
+				System.out.println("customer at cashier");
 				isHungry = false;
 				gui.setCustomerEnabled(agent);
 			}
@@ -78,14 +78,43 @@ public class CustomerGui implements Gui{
 	}
 
 	public void DoGoToSeat(int seatnumber) {//later you will map seatnumber to table coordinates.
+		
 		xDestination = seatnumber*100;
 		yDestination = yTable;
 		command = Command.GoToSeat;
 	}
 
 	public void DoExitRestaurant() {
-		xDestination = -40;
+		xDestination = 100;
 		yDestination = -40;
 		command = Command.LeaveRestaurant;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -106,7 +106,7 @@ frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         if (person instanceof CustomerAgent) {
             CustomerAgent customer = (CustomerAgent) person;
             stateCB.setText("Hungry?");
-            System.out.println("HEY2"+customer.getName());
+          
           //Should checkmark be there? 
             stateCB.setSelected(customer.getGui().isHungry());
           //Is customer hungry? Hack. Should ask customerGui

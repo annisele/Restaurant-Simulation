@@ -83,10 +83,12 @@ if(type=="Waiter"){
       
         opanel.add(namebox);
         opanel.setMaximumSize(new Dimension (300,250));
+        if(type=="Customer"){
         newCB =new JCheckBox();
         newCB.addActionListener(this);
         newCB.setText("Hungry?");
         opanel.add(newCB);
+        }
         add(opanel);
         add(pane);
         
@@ -109,26 +111,27 @@ if(type=="Waiter"){
              newCB.setSelected(false);
              		
          }
-    	 if (e.getSource() == addWaiter) {
+    	 else if (e.getSource() == addWaiter) {
           	// Chapter 2.19 describes showInputDialog()
-              addPerson( namebox.getText(), newCB.isSelected());
+              addPerson( namebox.getText(), false);
            
-              namebox.setText("");
-              newCB.setSelected(false);  		
+              namebox.setText("");	
           }
     	 else {
          	// Isn't the second for loop more beautiful?
              /*for (int i = 0; i < list.size(); i++) {
                  JButton temp = list.get(i);*/
          	for (JButton temp:customerlist){
-                 if (e.getSource() == temp)
+                 if (e.getSource() == temp){
                 	 System.out.println("here: "+type+" "+ temp.getText());
                      restPanel.showInfo("Customer", temp.getText());
+                 }
              }
          	for (JButton temp:waiterlist){
-                if (e.getSource() == temp)
+                if (e.getSource() == temp){
                	 System.out.println(type);
                     restPanel.showInfo(type, temp.getText());
+                }
             }
          }
     }
@@ -159,7 +162,6 @@ if(type=="Waiter"){
             }
            if(type.equals("Waiter")){
             waiterlist.add(button);
-            System.out.println("herehhre");
             } 
             view.add(button);
             restPanel.addPerson(type, name, hungry);//puts customer on list

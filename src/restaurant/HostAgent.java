@@ -92,9 +92,7 @@ public class HostAgent extends Agent {
 		for (Table table : tables) {
 			if (!table.isOccupied()) {
 				if (!waitingCustomers.isEmpty()) {
-					if(!waiters.isEmpty()){
-					
-					
+					if(!waiters.isEmpty()){			
 					assignWaiter(waitingCustomers.get(0),  table);//the action
 					
 					

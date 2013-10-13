@@ -26,11 +26,13 @@ public class WaiterAgent extends Agent {
 	//Later we will see how it is implemented
 public List <mycustomer>customers
 = new ArrayList<mycustomer>();
+public Map<String,Double> Menu= new HashMap<String, Double>();
 private HostAgent host;
 private CookAgent cook;
+private CashierAgent cashier;
 enum CustomerState{
 	waiting,seated,asked, readytoorder, askedtoorder,ordered, 
-	waitingfororder, mustreorder, pend, waitingforfood, eating, leaving;
+	waitingfororder, mustreorder, pend, waitingforfood, eating, waitingtopay,leaving;
 }
 class mycustomer {
 	CustomerAgent c;
@@ -49,15 +51,19 @@ class mycustomer {
 }
 	private String name;
 	private Semaphore atTable = new Semaphore(0,true);
-	private Semaphore waitForOrder =new Semaphore(0,true);
+	private Semaphore atLobby =new Semaphore(1,true);
 	public boolean w_at_table;
+	public boolean w_at_lobby;
 	private boolean WantToGoOnBreak=false;
 
 	public WaiterGui waiterGui = null;
 
 	public WaiterAgent(String name) {
 		super();
-
+		Menu.put("chicken",10.99);	
+		Menu.put("skeak",15.99);
+		Menu.put("salad",5.99);
+		Menu.put("pizza",8.99);
 		this.name = name;
 		
 	}
@@ -78,7 +84,11 @@ class mycustomer {
 		this.host = host;
 	}
 	public void setCook(CookAgent cook) {
+	
 		this.cook = cook;
+	}
+	public void setCashier(CashierAgent c) {
+		this.cashier = c;
 	}
 	// Messages
 	public void wantsaBreak(){
@@ -89,6 +99,7 @@ class mycustomer {
  
 	public void msgSeatCustomer(CustomerAgent c, int table_num){
 		Do("Recieved msg seat cust");
+		//GetsMenu();
 		mycustomer cust = new mycustomer (c, table_num);
 		cust.state= CustomerState.waiting;
 		customers.add(cust);
@@ -97,17 +108,13 @@ class mycustomer {
 	}
 		public void msgReadyToOrder(CustomerAgent c){
 			Do("Recieved msg ready to order");
-			
-			mycustomer mc=customers.get(0);
-			
+				
 			for (int i = 0; i< customers.size();i++){
 				
 				if (customers.get(i).c == c){
 					customers.get(i).state=CustomerState.askedtoorder;
 					stateChanged();
 				}
-				else
-					mc= null;
 			}
 			
 				
@@ -124,7 +131,6 @@ class mycustomer {
 			if (customers.get(i).c == c){
 				customers.get(i).state=CustomerState.ordered;
 				customers.get(i).choice=choice;
-				Do("here");
 				stateChanged();
 				}
 		try {
@@ -162,6 +168,17 @@ class mycustomer {
 		}
 		
 	}
+	public void msgReadyToPay(CustomerAgent c){
+		Do("Recieved msg cust is ready to pay");
+		
+		for (int i = 0; i< customers.size();i++){
+			if(customers.get(i).c==c){
+				waiterGui.DoBringToTable(customers.get(i).table_num); 
+				customers.get(i).state=CustomerState.waitingtopay;
+				stateChanged();
+			}
+		}
+	}
 
 
 	public void msgAtTable() {//from animation
@@ -172,6 +189,14 @@ class mycustomer {
 		
 		stateChanged();
 	}
+	public void msgAtLobby() {//from animation
+		
+
+			atLobby.release();// = true;
+			w_at_lobby=true;
+			
+			stateChanged();
+		}
 	
 
 	/**
@@ -187,11 +212,13 @@ class mycustomer {
 		for (mycustomer c : customers) {
 	
 				if (c.state == CustomerState.waiting) {
+					if(w_at_lobby==true){
 					SeatCustomer(c, c.table_num);//the action
 					return true;//return true to the abstract agent to reinvoke the scheduler.
 				}
+				}
 				if (c.state == CustomerState.askedtoorder) {
-					if(w_at_table==true){
+					if(w_at_table==true||w_at_lobby==false){
 						Do("waiter at table and customer is ready to order");
 					TakeOrder(c);//the action
 					return true;//return true to the abstract agent to reinvoke the scheduler.
@@ -200,14 +227,18 @@ class mycustomer {
 					{
 						waiterGui.DoBringToTable( c.table_num);
 						Do("walking");
+						w_at_lobby=false;
 					}
 				}
 				if (c.state == CustomerState.ordered) {
 					Do("customer has ordered "+c.choice);
-					waiterGui.DoLeaveCustomer();
+					if(w_at_lobby==true){
 					CallCook(c,c.table_num,c.choice);
 					return true;//return true to the abstract agent to reinvoke the scheduler.
 					}
+					else
+						waiterGui.DoLeaveCustomer();
+				}
 				if (c.state == CustomerState.mustreorder) {
 					if(w_at_table==true){
 					Do("customer must reorder");
@@ -228,7 +259,7 @@ class mycustomer {
 						waiterGui.DoLeaveCustomer();
 						c.c.msgFoodIsHere();
 						c.state = CustomerState.eating;
-							customers.remove(c);
+							
 							return true;
 				//return true to the abstract agent to reinvoke the scheduler.
 					}
@@ -238,10 +269,17 @@ class mycustomer {
 						Do("walking");
 					}
 				}
-
+				if(c.state == CustomerState.waitingtopay){
+					if(w_at_table==true){
+						c.c.msgHereIsCheck();
+						Do("customer recieved check");
+						waiterGui.DoLeaveCustomer();
+						customers.remove(c);
+						return true;
+					}
+				}
 					
-					else
-						Do(" ");
+					
 			}
 		
 		
@@ -253,9 +291,31 @@ class mycustomer {
 	}
 
 	// Actions
-
-	private void SeatCustomer(mycustomer customer, int table) {
+	
+/*	private void GetsMenu (){
+		if(chicken_low==false){
+		Menu.put("chicken",10.99);
+		}
+		if(steak_low==false){
+		Menu.put("skeak",15.99);
+		}
+		if(salad_low==false){
+		Menu.put("salad",5.99);
+		}
+		if(pizza_low==false){
+		Menu.put("pizza",8.99);
+		}
 		
+		Do("MENU: "+ Menu.entrySet());
+	}*/
+	private void SeatCustomer(mycustomer customer, int table) {
+		try {
+			atLobby.acquire();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		w_at_lobby=false;
 		customer.c.msgSitAtTable(this, table);
 		customer.state=CustomerState.seated;
 		DoSeatCustomer(customer.c, table);
@@ -271,6 +331,7 @@ class mycustomer {
 		waiterGui.DoLeaveCustomer();
 		w_at_table=false;
 		
+		
 	}
 
 	// The animation DoXYZ() routines
@@ -285,7 +346,6 @@ class mycustomer {
 		//int tablenum= table.tableNumber;
 		print("Seating " + customer + " at " + table);
 		waiterGui.DoBringToTable(table); 
-
 	}
 
 public void TakeOrder (mycustomer c){
@@ -294,7 +354,7 @@ public void TakeOrder (mycustomer c){
 	c.state=CustomerState.asked;
 }
 public void CallCook(mycustomer c, int tnum, String choice){
-	
+	//cashier.msgCustomerOrder(c,choice);
 	cook.msgCookOrder(this, tnum, choice);
 	c.state=CustomerState.waitingfororder;
 }

@@ -52,7 +52,11 @@ public class WaiterGui implements Gui {
         }
         else
         	agent.w_at_table=false;
-        	
+        
+       if (xPos == xDestination && yPos == yDestination
+       		& (xDestination == -20) & (yDestination == -20)) {
+          agent.msgAtLobby();
+      }
     }
 
     public void draw(Graphics2D g) {

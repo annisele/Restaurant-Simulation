@@ -1,6 +1,7 @@
 package restaurant;
 
 import agent.Agent;
+import restaurant.MarketAgent;
 import restaurant.CustomerAgent.AgentEvent;
 import restaurant.gui.HostGui;
 
@@ -18,11 +19,23 @@ public class CookAgent extends Agent {
 	
 	
 	private WaiterAgent waiter;
+	public List<MarketAgent> markets
+	= new ArrayList<MarketAgent>();
+	public Map<String,Double> Menu= new HashMap<String, Double>();
+
 	public class inventory{
 		int steak;
+		boolean steak_low=false;
+		boolean steak_gone=false;
 		int chicken;
+		boolean chicken_low=false;
+		boolean chicken_gone=false;
 		int salad;
+		boolean salad_low=false;
+		boolean salad_gone=false;
 		int pizza;
+		boolean pizza_low=false;
+		boolean pizza_gone=false;
 		
 		inventory( int st, int ch, int sa, int pi ){
 		steak=st;
@@ -32,7 +45,8 @@ public class CookAgent extends Agent {
 		
 		}
 	}
-	public inventory v= new inventory(5,0,5,5);
+	
+	public inventory v= new inventory(15,15,15,15);
 	public class order{
 		WaiterAgent w;
 		String choice;
@@ -46,13 +60,15 @@ public class CookAgent extends Agent {
 			state=OrderState.prep;
 		}
 	}
+	
 	public List <order> orders= new ArrayList<order>();
 	public enum OrderState
 	{ prep, notready, done };
 	public int num=0;
 	Timer timer = new Timer();
+	String name;
 	private boolean cooking=false;
-	
+	private int c_market=0;
 	public void setWaiter(WaiterAgent waitr) {
 		this.waiter = waitr;
 	}
@@ -60,8 +76,16 @@ public class CookAgent extends Agent {
 	
 	public CookAgent(){
 		super();
+		this.name="Cook";
 		cooking=false;
+	Menu.put("chicken",10.99);	
+		Menu.put("skeak",15.99);
+		Menu.put("salad",5.99);
+		Menu.put("pizza",8.99);
 		
+	}
+	public String getName() {
+		return name;
 	}
 
 	public void msgCookOrder(WaiterAgent w, int tnum, String choice) {
@@ -82,6 +106,39 @@ public class CookAgent extends Agent {
 	public void msgFoodDone(order oo) {
 		oo.state= OrderState.done;
 		stateChanged();
+	}
+	
+	public void msgHereAreItems(String item){
+		Do("Recieved msg items are restocked");
+		if(item.equals("steak")){
+			v.steak=+10;
+			v.steak_low=false;
+			if(v.steak_gone==true){
+				addToMenu("steak");
+			}
+		}
+		if(item.equals("chicken")){
+			v.chicken=+10;
+			v.chicken_low=false;
+			if(v.chicken_gone==true){
+				addToMenu("chicken");
+			}
+		}
+		if(item.equals("salad")){
+			v.salad=+10;
+			v.salad_low=false;
+			if(v.salad_gone==true){
+				addToMenu("salad");
+			}
+		}
+		if(item.equals("pizza")){
+			v.pizza=+10;
+			v.pizza_low=false;
+			if(v.pizza_gone==true){
+				addToMenu("pizza");
+			}
+		}
+			
 	}
 	/**
 	 * Scheduler.  Determine what action is called for, and do it.
@@ -119,37 +176,55 @@ public class CookAgent extends Agent {
 	}
 
 	// Actions
+	
+	
 	private boolean checkorder(String c){
-		if (c.equals( "chicken")) {
+		if (c.equals("chicken")) {
 			if (v.chicken!=0){
 			v.chicken--;
+				if(v.chicken<=5){
+					v.chicken_low=true;
+					callMarket(c);
+					Do("order chicken !!!!");
+				}
 			return true;
 			}
 			else
-				Do("HEYY");
 			return false;
 		}
 			
-		if (c== "steak"){
+		if (c.equals("steak")){
 			if (v.steak!=0){
 			v.steak--;
+			if(v.steak<=5){
+				v.steak_low=true;
+				callMarket(c);
+			}
 			return true;
 		}
 		else
 			return false;
 		}
 			
-		if (c== "salad"){
+		if (c.equals( "salad")){
 			if (v.salad!=0){
 			v.salad--;
+			if(v.salad<=5){
+				v.salad_low=true;
+				callMarket(c);
+			}
 			return true;
 		}
 		else
 			return false;
 		}
-		if (c== "pizza"){
+		if (c.equals( "pizza")){
 			if (v.pizza!=0){
 			v.pizza--;
+			if(v.pizza<=5){
+				v.pizza_low=true;
+				callMarket(c);
+			}
 			return true;
 		}
 		else
@@ -158,8 +233,9 @@ public class CookAgent extends Agent {
 		return false;
 	}
 	private void notcool(order o,int t){
-		Do("not cool");
+		Do("not cool-"+o.choice+ " is out");
 		setWaiter(o.w);
+		removeFromMenu(o.choice);
 		waiter.msgnofood(t);
 		orders.remove(o);
 	}
@@ -185,7 +261,6 @@ public class CookAgent extends Agent {
 			return i;
 			}
 		}
-		Do("WRONG");
 		return 0;
 	}
 	
@@ -196,11 +271,89 @@ public class CookAgent extends Agent {
 		orders.remove(o);
 		
 	}
-}
+	private void removeFromMenu(String choice){
+		Menu.remove(choice);
+		if(choice.equals("steak")){
+			v.steak_gone=true;
+		}
+		if(choice.equals("chicken")){
+			v.chicken_gone=true;
+		}
+		if(choice.equals("salad")){
+			v.salad_gone=true;
+		}
+		if(choice.equals("pizza")){
+			v.pizza_gone=true;
+		}
+	}
+	private void addToMenu(String choice){
+		if(choice.equals("steak")){
+			Menu.put("steak",15.99);
+			v.steak_gone=false;
+		}
+		if(choice.equals("chicken")){
+			Menu.put("chicken",11.99);
+			v.chicken_gone=false;
+		}
+		if(choice.equals("salad")){
+			Menu.put("salad",5.99);
+			v.salad_gone=false;
+		}
+		if(choice.equals("pizza")){
+			Menu.put("pizza",8.99);
+			v.pizza_gone=false;
+		}
+	}
+	private void callMarket(String item){
+		markets.get(c_market).msgLowOnItem(this, item);
+		c_market++;
+	}
+	
+
 	// The animation DoXYZ() routines
 	
 
 	//utilities
+
+public void addMarket(MarketAgent m){
+	markets.add(m);
+}
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	
 	
