@@ -47,8 +47,10 @@ public class CustomerGui implements Gui{
 		if (xPos == xDestination && yPos == yDestination) {
 			if (command==Command.GoToSeat) agent.msgAnimationFinishedGoToSeat();
 			else if (command==Command.LeaveRestaurant) {
-				agent.msgAnimationFinishedLeaveRestaurant();
+				agent.msgPaying();
 				System.out.println("customer at cashier");
+
+				agent.msgAnimationFinishedLeaveRestaurant();
 				isHungry = false;
 				gui.setCustomerEnabled(agent);
 			}

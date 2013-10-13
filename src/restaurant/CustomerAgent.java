@@ -18,7 +18,8 @@ public class CustomerAgent extends Agent {
 	
 	
 	private int tnum;
-	private double cashmoney;
+	private double cashmoney, customer_check;
+	
 	private String name, choice;
 	private int hungerLevel = 5;        // determines length of meal
 	Timer timer = new Timer();
@@ -59,7 +60,7 @@ public class CustomerAgent extends Agent {
 			e.printStackTrace();
 		}
 		Do("$$$= "+cashmoney);
-		good_call=false;
+		customer_check=0;
 	}
 
 	/**
@@ -122,8 +123,13 @@ public class CustomerAgent extends Agent {
 		event = AgentEvent.gotFood;
 		stateChanged();
 	}
-	public void msgHereIsCheck(){
+	public void msgHereIsCheck(double c){
 		Do("Recieved Check");
+		if(cashmoney>c){
+		customer_check=c;
+		}
+		else
+			customer_check=cashmoney;
 		event = AgentEvent.paying;
 		stateChanged();
 	}
@@ -131,12 +137,14 @@ public class CustomerAgent extends Agent {
 		//from animation
 		cashmoney-=waiter.Menu.get(this.choice);
 		event = AgentEvent.Leaving;
+		
 		stateChanged();
 	}
 	public void msgAnimationFinishedLeaveRestaurant() {
 		//from animation
 		event = AgentEvent.doneLeaving;
 		stateChanged();
+		Do("Has left restuarant");
 	}
 	
 	
@@ -312,9 +320,10 @@ public class CustomerAgent extends Agent {
 	}
 	private void AtCashiers(){
 		Do("At cashiers");
-		//cashier.msgHereIsMoney();
+		cashier.msgHereIsMoney(this, customer_check);
+		cashmoney-=customer_check;
 		host.msgLeavingTable(this);
-		event = AgentEvent.doneLeaving;
+		
 	}
 	// Accessors, etc.
 

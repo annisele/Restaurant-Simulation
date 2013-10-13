@@ -38,7 +38,7 @@ class mycustomer {
 	CustomerAgent c;
 	int table_num;
 	boolean at_table;
-	
+	double check;
 	String choice;
 	CustomerState state;
 	
@@ -46,6 +46,7 @@ class mycustomer {
 	c=cust;
 	table_num=tablenum;
 	state= CustomerState.waiting;
+	check=0;
 	
 	}
 }
@@ -98,7 +99,7 @@ class mycustomer {
 	}
  
 	public void msgSeatCustomer(CustomerAgent c, int table_num){
-		Do("Recieved msg seat cust");
+		Do("Recieved msg seat "+c);
 		//GetsMenu();
 		mycustomer cust = new mycustomer (c, table_num);
 		cust.state= CustomerState.waiting;
@@ -107,7 +108,7 @@ class mycustomer {
 		
 	}
 		public void msgReadyToOrder(CustomerAgent c){
-			Do("Recieved msg ready to order");
+			Do("Recieved msg "+c+" is ready to order");
 				
 			for (int i = 0; i< customers.size();i++){
 				
@@ -116,15 +117,17 @@ class mycustomer {
 					stateChanged();
 				}
 			}
-			
-				
-		
-		
+			try {
+				atLobby.acquire();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 		
 	public void msgHereIsMyChoice(CustomerAgent c, String choice){
 		//findthingforme();
-		Do("Recieved msg here is mychoice");
+		Do("Recieved msg "+c+" has made choice");
 		
 		for (int i = 0; i< customers.size();i++){
 			
@@ -133,12 +136,7 @@ class mycustomer {
 				customers.get(i).choice=choice;
 				stateChanged();
 				}
-		try {
-			atTable.acquire();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		//waitForOrder.release();
 		//customers.remove(customer);
 		//waiterGui.DoLeaveCustomer();
@@ -173,6 +171,7 @@ class mycustomer {
 		
 		for (int i = 0; i< customers.size();i++){
 			if(customers.get(i).c==c){
+				customers.get(i).check=cashier.msgGetCheck(c);
 				waiterGui.DoBringToTable(customers.get(i).table_num); 
 				customers.get(i).state=CustomerState.waitingtopay;
 				stateChanged();
@@ -256,8 +255,7 @@ class mycustomer {
 				if (c.state == CustomerState.waitingforfood) {
 					if(w_at_table==true){
 						Do("customer recieved order");
-						waiterGui.DoLeaveCustomer();
-						c.c.msgFoodIsHere();
+						BroughtFood(c);
 						c.state = CustomerState.eating;
 							
 							return true;
@@ -271,7 +269,7 @@ class mycustomer {
 				}
 				if(c.state == CustomerState.waitingtopay){
 					if(w_at_table==true){
-						c.c.msgHereIsCheck();
+						c.c.msgHereIsCheck(c.check);
 						Do("customer recieved check");
 						waiterGui.DoLeaveCustomer();
 						customers.remove(c);
@@ -350,12 +348,27 @@ class mycustomer {
 
 public void TakeOrder (mycustomer c){
 	Do("take order");
+	//go to table
+	try {
+		atTable.acquire();
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 	c.c.msgWhatsYourOrder();
 	c.state=CustomerState.asked;
+	//leave customer
+	
+}
+//reorder function
+public void BroughtFood(mycustomer c){
+	waiterGui.DoLeaveCustomer();
+	c.c.msgFoodIsHere();
 }
 public void CallCook(mycustomer c, int tnum, String choice){
-	//cashier.msgCustomerOrder(c,choice);
+	cashier.msgCustomerOrder(c.c,choice);
 	cook.msgCookOrder(this, tnum, choice);
+	Do("gives cashier order");
 	c.state=CustomerState.waitingfororder;
 }
 
