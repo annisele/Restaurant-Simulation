@@ -399,6 +399,7 @@ public class CustomerAgent extends Agent {
 	private void Leave(){
 		event=AgentEvent.doneLeaving;
 		customerGui.DoExitRestaurant();
+		waiter.msgCustLeave(this);
 		host.msgLeavingTable(this);
 		Do("customer "+this+" has left");
 	}

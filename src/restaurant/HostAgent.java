@@ -28,7 +28,6 @@ public class HostAgent extends Agent {
 	//Later we will see how it is implemented
     private int currentwaiter=0;
 	private String name;
-	private Semaphore atTable = new Semaphore(0,true);
 
 	public HostGui hostGui = null;
 

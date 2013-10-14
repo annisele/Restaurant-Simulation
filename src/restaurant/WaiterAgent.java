@@ -185,7 +185,13 @@ class mycustomer {
 		}
 	}
 
-
+	public void msgCustLeave(CustomerAgent c){
+		for (int i = 0; i< customers.size();i++){
+			if (customers.get(i).c == c){
+				customers.remove(customers.get(i));
+			}
+		}
+	}
 	public void msgAtTable() {//from animation
 	print("at table");
 
@@ -236,7 +242,7 @@ class mycustomer {
 		for (mycustomer c : customers) {
 	
 				if (c.state == CustomerState.waiting) {
-					if(w_at_lobby=true){
+					if(w_at_lobby==true){
 					SeatCustomer(c, c.table_num);//the action
 					return true;//return true to the abstract agent to reinvoke the scheduler.
 				}
@@ -307,6 +313,7 @@ class mycustomer {
 	
 	//goone
 	private void SeatCustomer(mycustomer customer, int table) {
+		waiterGui.DoLeaveCustomer();
 		try {
 			atLobby.acquire();
 		} catch (InterruptedException e) {
