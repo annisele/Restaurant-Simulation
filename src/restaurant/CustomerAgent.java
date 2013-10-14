@@ -34,7 +34,7 @@ public class CustomerAgent extends Agent {
 	private boolean good_call;
 	//    private boolean isHungry = false; //hack for gui
 	public enum AgentState
-	{DoingNothing, WaitingInRestaurant, BeingSeated, Seated, WaitingForWaiter,  WaitingForFood, readytopay, Eating, DoneEating, Leaving};
+	{DoingNothing, WaitingInRestaurant, BeingSeated, Seated, WaitingForWaiter,  WaitingForFood, Reordered,readytopay, Eating, DoneEating, Leaving};
 	private AgentState state = AgentState.DoingNothing;//The start state
 
 	public enum AgentEvent 
@@ -113,10 +113,7 @@ public class CustomerAgent extends Agent {
 		event = AgentEvent.x;
 		Do("recieved msg to reorder "+this.event);
 		
-		String c_;
-		do {c_= g_choice();
-		}while(c_==c);
-		this.choice=c_;
+		
 		stateChanged();
 	}
 	public void msgFoodIsHere(){
@@ -135,7 +132,7 @@ public class CustomerAgent extends Agent {
 	}
 	public void msgPaying() {
 		//from animation
-		cashmoney-=waiter.Menu.get(this.choice);
+		Do("paying"+state);
 		event = AgentEvent.Leaving;
 		
 		stateChanged();
@@ -178,15 +175,24 @@ public class CustomerAgent extends Agent {
 			state = AgentState.WaitingForFood;
 			if (cashmoney>=6){
 			choice=g_choice();
+			if(choice.equals("nooo")){
+				Leave();
+				state=AgentState.Leaving;
+			}
 			Order(choice);
 			return true;
 			}
 		}
 
 		if (state ==  AgentState.WaitingForFood && event == AgentEvent.x){
-			//state= AgentState.BeingSeated;
+			state= AgentState.Reordered;
 			Do("back to order");
 			Reorder();
+			return true;
+		}
+		if (state == AgentState.Reordered&& event == AgentEvent.gotFood){
+			state = AgentState.Eating;
+			EatFood();
 			return true;
 		}
 		if (state == AgentState.WaitingForFood && event == AgentEvent.gotFood){
@@ -206,6 +212,7 @@ public class CustomerAgent extends Agent {
 		}
 		if (state == AgentState.Leaving && event == AgentEvent.Leaving){
 			state = AgentState.DoingNothing;
+			Do("here");
 			AtCashiers();
 			return true;
 		}
@@ -246,39 +253,66 @@ public class CustomerAgent extends Agent {
 	}
 	private String g_choice(){
 
+		if (cashmoney>=6){
+			while(true){
 
-		while(true){
-		
-			Random g = new Random();
-			Object[] values =cook.Menu.values().toArray();
-			Double r_val = (Double) values[g.nextInt(values.length)];
-			Do("making choice: "+r_val);
-			Do("cash: "+cashmoney);
-			if (r_val==11.99){
-				if(cashmoney>=12){
-					choice="chicken";
-					break;
+				Random g = new Random();
+				Object[] values =cook.Menu.values().toArray();
+				Double r_val = (Double) values[g.nextInt(values.length)];
+				Do("making choice: "+r_val);
+				Do("cash: "+cashmoney);
+				if (r_val==11.99){
+					if(cashmoney>=12){
+						choice="chicken";
+						break;
+					}
+				}
+				if (r_val==15.99){
+					if(cashmoney>=16){
+						choice="steak";
+						break;
+					}
+				}
+				if (r_val==5.99){
+					if(cashmoney>=6){
+						choice="salad";
+						break;
+					}
+				}
+				if (r_val==8.99){
+					if(cashmoney>=9){
+						choice="pizza";
+						break;
+					}
 				}
 			}
-			if (r_val==15.99){
-				if(cashmoney>=16){
-					choice="steak";
-					break;
-				}
+			return choice;
+		}
+		else{
+			Do("customer is low on money!");
+			int temp= (int)(Math.random()*(8));
+			if(temp==4||temp==5||temp==6||temp==7){
+				Do("customer is angry and leaving the restaurant because "
+						+ "ze cannot pay");
+				return "nooo";
 			}
-			if (r_val==5.99){
-				if(cashmoney>=6){
-					choice="salad";
-					break;
-				}
+			if(temp==0){
+				choice="steak";
+				return choice;
 			}
-			if (r_val==8.99){
-				if(cashmoney>=9){
-					choice="pizza";
-					break;
-				}
+			if(temp==1){
+				choice="chicken";
+				return choice;
 			}
+			if(temp==2){
+				choice="salad";
+				return choice;
 			}
+			if(temp==3){
+				choice="pizza";
+				return choice;
+			}
+		}
 		return choice;
 	}
 	private void Order (String ch){
@@ -286,8 +320,9 @@ public class CustomerAgent extends Agent {
 		waiter.msgHereIsMyChoice(this, ch);
 	}
 	private void Reorder(){
-		Do("reOrder ");
-		waiter.msgHereIsMyChoice(this, this.choice);
+		Do("reordering ");
+		String c= g_choice();
+		waiter.msgHereIsMyChoice(this, c);
 	}
 	private void EatFood() {
 		Do("Eating Food");
@@ -320,10 +355,17 @@ public class CustomerAgent extends Agent {
 	}
 	private void AtCashiers(){
 		Do("At cashiers");
+		cashmoney-=waiter.Menu.get(this.choice);
 		cashier.msgHereIsMoney(this, customer_check);
 		cashmoney-=customer_check;
 		host.msgLeavingTable(this);
 		
+	}
+	private void Leave(){
+		event=AgentEvent.doneLeaving;
+		customerGui.DoExitRestaurant();
+		host.msgLeavingTable(this);
+		Do("customer "+this+" has left");
 	}
 	// Accessors, etc.
 

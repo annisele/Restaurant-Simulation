@@ -121,11 +121,11 @@ public class CashierAgent extends Agent {
 	
 	
 	private void CreateCheck(order o){
-		Do("creating check "+o.choice+" menu  "+Menu.entrySet());
+		Do("creating check ");
 		for(order current: cashiers_list){
 			if(current==o){
 	current.payment=Menu.get(o.choice);
-	Do("customer"+o.cust+ "needs to pay: "+current.payment);
+	Do(""+o.cust+ "needs to pay: "+current.payment);
 	current.state= OrderState.waiting;
 	stateChanged();
 			}

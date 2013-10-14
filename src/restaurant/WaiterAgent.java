@@ -32,7 +32,8 @@ private CookAgent cook;
 private CashierAgent cashier;
 enum CustomerState{
 	waiting,seated,asked, readytoorder, askedtoorder,ordered, 
-	waitingfororder, mustreorder, pend, waitingforfood, eating, waitingtopay,leaving;
+	waitingfororder, mustreorder, pend, waitingforfood, eating, 
+	waitingtopay,finished,leaving;
 }
 class mycustomer {
 	CustomerAgent c;
@@ -117,12 +118,7 @@ class mycustomer {
 					stateChanged();
 				}
 			}
-			try {
-				atLobby.acquire();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
 	}
 		
 	public void msgHereIsMyChoice(CustomerAgent c, String choice){
@@ -147,7 +143,7 @@ class mycustomer {
 	
 	public void msgnofood(int table){
 		Do("recieved msg that food is unavailable");
-		waiterGui.DoBringToTable(table); 
+		
 		for (int i = 0; i< customers.size();i++){
 			if(customers.get(i).table_num==table){
 				customers.get(i).state=CustomerState.mustreorder;
@@ -157,7 +153,6 @@ class mycustomer {
 	}
 	public void msgFoodReady(int table){
 		Do("Recieved msg from cook that food is ready");
-		waiterGui.DoBringToTable(table); 
 		for (int i = 0; i< customers.size();i++){
 			if(customers.get(i).table_num==table){
 				customers.get(i).state=CustomerState.waitingforfood;
@@ -171,8 +166,6 @@ class mycustomer {
 		
 		for (int i = 0; i< customers.size();i++){
 			if(customers.get(i).c==c){
-				customers.get(i).check=cashier.msgGetCheck(c);
-				waiterGui.DoBringToTable(customers.get(i).table_num); 
 				customers.get(i).state=CustomerState.waitingtopay;
 				stateChanged();
 			}
@@ -211,70 +204,60 @@ class mycustomer {
 		for (mycustomer c : customers) {
 	
 				if (c.state == CustomerState.waiting) {
-					if(w_at_lobby==true){
+					if(w_at_lobby=true){
 					SeatCustomer(c, c.table_num);//the action
 					return true;//return true to the abstract agent to reinvoke the scheduler.
 				}
 				}
+				
 				if (c.state == CustomerState.askedtoorder) {
-					if(w_at_table==true||w_at_lobby==false){
+					
 						Do("waiter at table and customer is ready to order");
 					TakeOrder(c);//the action
 					return true;//return true to the abstract agent to reinvoke the scheduler.
-					}
-					else
-					{
-						waiterGui.DoBringToTable( c.table_num);
-						Do("walking");
-						w_at_lobby=false;
-					}
+					
 				}
+	
 				if (c.state == CustomerState.ordered) {
 					Do("customer has ordered "+c.choice);
+					
 					if(w_at_lobby==true){
-					CallCook(c,c.table_num,c.choice);
-					return true;//return true to the abstract agent to reinvoke the scheduler.
+						c.state=CustomerState.waitingfororder;
+						DeliverOrder(c,c.table_num,c.choice);
+						return true;
 					}
-					else
-						waiterGui.DoLeaveCustomer();
+					
+						
+					
 				}
 				if (c.state == CustomerState.mustreorder) {
-					if(w_at_table==true){
+					
 					Do("customer must reorder");
+					
+					ReOrder(c);
 					//waiterGui.DoBringToTable( c.table_num);
-					c.c.msgReorder(c.table_num,c.choice);
+				
 					c.state=CustomerState.pend;
 					return true;//return true to the abstract agent to reinvoke the scheduler.
-					}
-					else
-					{
-						waiterGui.DoBringToTable( c.table_num);
-						Do("walking");
-					}
+					
 				}
 				if (c.state == CustomerState.waitingforfood) {
-					if(w_at_table==true){
+					
 						Do("customer recieved order");
-						BroughtFood(c);
+						GettingFood(c);
+						ServeFood(c);
 						c.state = CustomerState.eating;
 							
 							return true;
 				//return true to the abstract agent to reinvoke the scheduler.
-					}
-					else
-					{
-						waiterGui.DoBringToTable( c.table_num);
-						Do("walking");
-					}
+					
 				}
 				if(c.state == CustomerState.waitingtopay){
-					if(w_at_table==true){
-						c.c.msgHereIsCheck(c.check);
-						Do("customer recieved check");
-						waiterGui.DoLeaveCustomer();
-						customers.remove(c);
+				
+						DeliverCheck(c);
+						c.state=CustomerState.finished;
 						return true;
-					}
+					
 				}
 					
 					
@@ -290,22 +273,7 @@ class mycustomer {
 
 	// Actions
 	
-/*	private void GetsMenu (){
-		if(chicken_low==false){
-		Menu.put("chicken",10.99);
-		}
-		if(steak_low==false){
-		Menu.put("skeak",15.99);
-		}
-		if(salad_low==false){
-		Menu.put("salad",5.99);
-		}
-		if(pizza_low==false){
-		Menu.put("pizza",8.99);
-		}
-		
-		Do("MENU: "+ Menu.entrySet());
-	}*/
+
 	private void SeatCustomer(mycustomer customer, int table) {
 		try {
 			atLobby.acquire();
@@ -347,30 +315,91 @@ class mycustomer {
 	}
 
 public void TakeOrder (mycustomer c){
-	Do("take order");
-	//go to table
+	
+	waiterGui.DoBringToTable( c.table_num);
+	w_at_lobby=false;
 	try {
 		atTable.acquire();
 	} catch (InterruptedException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
+	Do("take order");
 	c.c.msgWhatsYourOrder();
-	c.state=CustomerState.asked;
-	//leave customer
+	waiterGui.DoLeaveCustomer();
+	w_at_table=false;
+	
+	
 	
 }
 //reorder function
-public void BroughtFood(mycustomer c){
+public void DeliverOrder (mycustomer c, int tnum, String choice){
+ 
+ try {
+		atLobby.acquire();
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
+ cook.msgCookOrder(this, tnum, choice);
+}
+public void GettingFood(mycustomer c){
+	Do("waiter is picking up order");
+	//getfood, go to lobby try at lobby
+	//go to table
 	waiterGui.DoLeaveCustomer();
+	try {
+		atLobby.acquire();
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
+	 Do("gives cashier "+c.c+" order");
+	 cashier.msgCustomerOrder(c.c,c.choice);
+	
+}
+public void ServeFood(mycustomer c){
+	Do("waiter is delivering order");
+	waiterGui.DoBringToTable(c.table_num); 
+	try {
+		atTable.acquire();
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
 	c.c.msgFoodIsHere();
+	waiterGui.DoLeaveCustomer();
 }
-public void CallCook(mycustomer c, int tnum, String choice){
-	cashier.msgCustomerOrder(c.c,choice);
-	cook.msgCookOrder(this, tnum, choice);
-	Do("gives cashier order");
-	c.state=CustomerState.waitingfororder;
+/*servefood
+ * at tabe aquire
+ * msg customer here is food
+ * leavecustomer
+ */
+
+public void ReOrder(mycustomer c){
+	waiterGui.DoBringToTable(c.table_num); 
+	try {
+		atTable.acquire();
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
+	waiterGui.DoLeaveCustomer();
+	w_at_table=false;
+	c.c.msgReorder(c.table_num,c.choice);
+	
 }
+public void DeliverCheck(mycustomer c){
+Do("delivering check");
+	c.check=cashier.msgGetCheck(c.c);
+	waiterGui.DoBringToTable(c.table_num); 
+	try {
+		atTable.acquire();
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
+	c.c.msgHereIsCheck(c.check);
+	Do("customer recieved check");
+	waiterGui.DoLeaveCustomer();
+	customers.remove(c);
+}
+
 
 	//utilities
 

@@ -45,8 +45,8 @@ public class CookAgent extends Agent {
 		
 		}
 	}
-	
-	public inventory v= new inventory(15,15,15,15);
+	int x;
+	public inventory v= new inventory(15,x,15,15);
 	public class order{
 		WaiterAgent w;
 		String choice;
