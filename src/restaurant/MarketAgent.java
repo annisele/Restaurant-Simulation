@@ -50,6 +50,9 @@ public class MarketAgent extends Agent {
 		store_name=name;
 		
 	}
+	public String getname(){
+		return name;
+	}
 	public void msgLowOnItem(CookAgent c, String item){
 		Do("Recieved msg that "+item+" is low");
 		setCook(c);
@@ -59,10 +62,12 @@ public class MarketAgent extends Agent {
 			stateChanged();	
 		}
 		else
-			noInventory();
+			noInventory(item);
 	}
 
-	
+	public void hack_steak(){
+		v.steak=0;
+	}
 
 	/**
 	 * Scheduler.  Determine what action is called for, and do it.
@@ -135,8 +140,8 @@ public class MarketAgent extends Agent {
 		return false;
 	}
 	
-	private void noInventory() {
-		
+	private void noInventory(String i) {
+		cook.msgNoInventory(i);
 		
 	}
 	private void Restock(){

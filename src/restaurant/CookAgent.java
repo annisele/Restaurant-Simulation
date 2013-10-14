@@ -94,6 +94,10 @@ public class CookAgent extends Agent {
 	public void hack_salad(){
 		v.salad=0;
 	}
+	public void hack_steak(){
+		v.steak=0;
+		markets.get(0).hack_steak();
+	}
 	public void msgCookOrder(WaiterAgent w, int tnum, String choice) {
 		Do("Recieve msg to cook order");
 		//waiter=w;
@@ -145,6 +149,11 @@ public class CookAgent extends Agent {
 			}
 		}
 			
+	}
+	public void msgNoInventory(String item){
+		Do("Recieved msg market out of item");
+		c_market++;
+		callMarket(item);
 	}
 	/**
 	 * Scheduler.  Determine what action is called for, and do it.
@@ -321,8 +330,10 @@ public class CookAgent extends Agent {
 		}
 	}
 	private void callMarket(String item){
+		Do("ordering from market "+c_market);
+	
 		markets.get(c_market).msgLowOnItem(this, item);
-		c_market++;
+		
 	}
 	
 

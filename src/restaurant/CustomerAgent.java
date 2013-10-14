@@ -33,6 +33,7 @@ public class CustomerAgent extends Agent {
 	private CookAgent cook;
 	private boolean hack_c=false;
 	private boolean hack_s=false;
+	private boolean hack_st=false;
 	//    private boolean isHungry = false; //hack for gui
 	public enum AgentState
 	{DoingNothing, WaitingInRestaurant, BeingSeated, Seated, WaitingForWaiter,  WaitingForFood, Reordered,readytopay, Eating, DoneEating, Leaving};
@@ -89,6 +90,10 @@ public class CustomerAgent extends Agent {
 		hack_s=true;
 		cook.hack_salad();
 	}
+	public void hack_steak(){
+		hack_st=true;
+		cook.hack_steak();
+	}
 	public String getCustomerName() {
 		return name;
 	}
@@ -99,7 +104,9 @@ public class CustomerAgent extends Agent {
 		if(hack_s==true){
 			cashmoney=6;
 		}
-		
+		if(hack_st==true){
+			cashmoney=18;
+		}
 		event = AgentEvent.gotHungry;
 		stateChanged();
 	}
@@ -193,7 +200,10 @@ public class CustomerAgent extends Agent {
 			if (hack_c==true){
 				Order("chicken");
 			}
-			else{
+			if (hack_st==true){
+				Order("steak");
+			}
+			if(hack_st==false&&hack_c==false){
 				Do("LOW "+lowestprice);
 				Do("$"+cashmoney);
 			choice=g_choice();
@@ -343,6 +353,9 @@ public class CustomerAgent extends Agent {
 	}
 	private void Reorder(){
 		Do("reordering ");
+		if(hack_st==true){
+			hack_st=false;
+		}
 		String c= g_choice();
 		waiter.msgHereIsMyChoice(this, c);
 	}

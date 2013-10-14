@@ -151,6 +151,10 @@ public class RestaurantPanel extends JPanel {
 				System.out.println("OUT OF STOCK SENARIO");
 				c.hack_chicken();
 			}
+			if(name.equals("steak")){
+				System.out.println("ORDER FROM MULT MARKETS SENARIO");
+				c.hack_steak();
+			}
 			if(name.equals("salad")){
 				System.out.println("CUSTOMER LEAVES AFTER CHEAPEST ITEM OUT OF STOCK SENARIO");
 				c.hack_salad();
