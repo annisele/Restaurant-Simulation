@@ -60,7 +60,17 @@ public class HostAgent extends Agent {
 		
 	}
 	// Messages
-
+	public void msgAskToBreak(WaiterAgent w){
+		if(waiters.size()>1){
+			w.msgCanBreak(true);
+			waiters.remove(w);
+		}
+		else
+			w.msgCanBreak(false);
+	}
+	public void msgRestate(WaiterAgent w){
+		waiters.add(w);
+	}
 	public void msgIWantFood(CustomerAgent cust) {
 		waitingCustomers.add(cust);
 		stateChanged();
@@ -78,7 +88,9 @@ public class HostAgent extends Agent {
 		}
 	
 	}
-
+//msg break
+	//if only waiter null
+	
 
 	/**
 	 * Scheduler.  Determine what action is called for, and do it.
@@ -126,7 +138,8 @@ public class HostAgent extends Agent {
 	}
 
 	
-
+//wanttobreak
+	//mesg
 	//utilities
 
 	public void setGui(HostGui gui) {

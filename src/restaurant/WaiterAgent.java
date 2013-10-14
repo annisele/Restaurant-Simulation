@@ -52,11 +52,13 @@ class mycustomer {
 	}
 }
 	private String name;
+	Timer breaktimer = new Timer();
 	private Semaphore atTable = new Semaphore(0,true);
 	private Semaphore atLobby =new Semaphore(1,true);
 	public boolean w_at_table;
 	public boolean w_at_lobby;
 	private boolean WantToGoOnBreak=false;
+	private boolean WaitingToBreak=false;
 
 	public WaiterGui waiterGui = null;
 
@@ -96,9 +98,20 @@ class mycustomer {
 	public void wantsaBreak(){
 		Do("waiter wants break");
 		WantToGoOnBreak=true;
-		waiterGui.DoLeaveCustomer();
 	}
- 
+	public void msgCanBreak(boolean bool){
+		if(bool==true){
+			Do("host allow break");
+			WaitingToBreak=true;
+			WantToGoOnBreak=false;
+		}
+		if(bool==false){
+			Do("host refuse break");
+			WantToGoOnBreak=false;
+			waiterGui.reset();
+					
+		}
+	}
 	public void msgSeatCustomer(CustomerAgent c, int table_num){
 		Do("Recieved msg seat "+c);
 		//GetsMenu();
@@ -200,7 +213,26 @@ class mycustomer {
             so that table is unoccupied and customer is waiting.
             If so seat him at the table.
 		 */
-	
+	//if want to break
+		//ask host
+		if(WantToGoOnBreak==true){
+			host.msgAskToBreak(this);
+			return true;
+		}
+		if(WantToGoOnBreak==false&&WaitingToBreak==true){
+			if(customers.size()==0){
+				waiterGui.DoLeaveCustomer();
+				waiterGui.set();
+				Do("On break");
+				breaktimer.schedule(new TimerTask(){
+					Object cookie = 1;
+					public void run() {
+						EndBreak();
+						WaitingToBreak=false;
+					}
+				}, 8000);
+			}
+		}
 		for (mycustomer c : customers) {
 	
 				if (c.state == CustomerState.waiting) {
@@ -273,7 +305,7 @@ class mycustomer {
 
 	// Actions
 	
-
+	//goone
 	private void SeatCustomer(mycustomer customer, int table) {
 		try {
 			atLobby.acquire();
@@ -400,7 +432,10 @@ Do("delivering check");
 	customers.remove(c);
 }
 
-
+public void EndBreak(){
+	Do("End break");
+	host.msgRestate(this);
+}
 	//utilities
 
 	public void setGui(WaiterGui gui) {

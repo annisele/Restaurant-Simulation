@@ -227,7 +227,7 @@ public class CookAgent extends Agent {
 			return true;
 		}
 		else{
-			callMarket(c);
+			//callMarket(c);
 			return false;
 		}
 		}

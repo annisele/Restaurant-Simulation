@@ -17,7 +17,7 @@ import java.util.TimerTask;
 public class CustomerAgent extends Agent {
 	
 	
-	private int tnum;
+	private int tnum,lowestprice;
 	private double cashmoney, customer_check;
 	
 	private String name, choice;
@@ -31,8 +31,8 @@ public class CustomerAgent extends Agent {
 	private WaiterAgent waiter;
 	private CashierAgent cashier;
 	private CookAgent cook;
-	private boolean hack_c;
-	private boolean hack_s;
+	private boolean hack_c=false;
+	private boolean hack_s=false;
 	//    private boolean isHungry = false; //hack for gui
 	public enum AgentState
 	{DoingNothing, WaitingInRestaurant, BeingSeated, Seated, WaitingForWaiter,  WaitingForFood, Reordered,readytopay, Eating, DoneEating, Leaving};
@@ -51,8 +51,8 @@ public class CustomerAgent extends Agent {
 	public CustomerAgent(String name){
 		super();
 		this.name = name;
-		hack_c=false;
-		hack_s=false;
+
+		lowestprice=6;
 		double temp= 5+(double)(Math.random()*(15));
 		DecimalFormat f =new DecimalFormat("##.00");
 		String formate=f.format(temp);
@@ -87,7 +87,6 @@ public class CustomerAgent extends Agent {
 	}
 	public void hack_salad(){
 		hack_s=true;
-		cashmoney=6;
 		cook.hack_salad();
 	}
 	public String getCustomerName() {
@@ -97,6 +96,10 @@ public class CustomerAgent extends Agent {
 
 	public void gotHungry() {//from animation
 		print("I'm hungry");
+		if(hack_s==true){
+			cashmoney=6;
+		}
+		
 		event = AgentEvent.gotHungry;
 		stateChanged();
 	}
@@ -184,11 +187,15 @@ public class CustomerAgent extends Agent {
 		}
 		if (state ==  AgentState.WaitingForWaiter && event == AgentEvent.ordered){
 			state = AgentState.WaitingForFood;
+			if (hack_s==true){
+				lowestprice=9;
+			}
 			if (hack_c==true){
 				Order("chicken");
 			}
 			else{
-			if (cashmoney>=6){
+				Do("LOW "+lowestprice);
+				Do("$"+cashmoney);
 			choice=g_choice();
 			if(choice.equals("nooo")){
 				Leave();
@@ -196,7 +203,6 @@ public class CustomerAgent extends Agent {
 			}
 			Order(choice);
 			return true;
-			}
 			}
 		}
 
@@ -269,7 +275,7 @@ public class CustomerAgent extends Agent {
 	}
 	private String g_choice(){
 
-		if (cashmoney>=6){
+		if (cashmoney>=lowestprice){
 			while(true){
 
 				Random g = new Random();
@@ -307,24 +313,24 @@ public class CustomerAgent extends Agent {
 		else{
 			Do("customer is low on money!");
 			int temp= (int)(Math.random()*(8));
-			if(temp==4||temp==5||temp==6||temp==7){
+			if(temp==4||temp==5||temp==6||temp==7||hack_s==true){
 				Do("customer is angry and leaving the restaurant because "
 						+ "ze cannot pay");
 				return "nooo";
 			}
-			if(temp==0){
+			else if(temp==0){
 				choice="steak";
 				return choice;
 			}
-			if(temp==1){
+			else if(temp==1){
 				choice="chicken";
 				return choice;
 			}
-			if(temp==2){
+			else if(temp==2){
 				choice="salad";
 				return choice;
 			}
-			if(temp==3){
+			else if(temp==3){
 				choice="pizza";
 				return choice;
 			}

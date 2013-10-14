@@ -119,8 +119,8 @@ frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             WaiterAgent waiter = (WaiterAgent) person;
             stateCB.setText("Go on Break????");
             //Should checkmark be there?
-            stateCB.setEnabled(true);
-             stateCB.setSelected(false);
+            stateCB.setEnabled(waiter.getGui().onBreak());
+             stateCB.setSelected(!waiter.getGui().onBreak());
             //Is customer hungry? Hack. Should ask customerGui
           stateCB.validate();
             // Hack. Should ask customerGui
@@ -136,16 +136,18 @@ frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
      */
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == stateCB && currentPerson instanceof CustomerAgent) {
-        		System.out.println("asd");
+        		System.out.println("create cust");
                 CustomerAgent c = (CustomerAgent) currentPerson;
                 c.getGui().setHungry();
                 stateCB.setEnabled(false);
            
         }
-        else {
-        		System.out.println("cde");
+        if (e.getSource() == stateCB && currentPerson instanceof WaiterAgent) {
+            
+        		System.out.println("create waitr");
                 WaiterAgent w = (WaiterAgent) currentPerson;
                 w.getGui().setBreak();
+   
                 stateCB.setEnabled(false);
   
         }

@@ -20,10 +20,11 @@ public class WaiterGui implements Gui {
     //public List<int>[] a= new ArrayList<int>[5]();
     int[] tablelist = new int[3];
     private boolean isPresent = false;
-	private boolean onBreak = false;
+	private boolean onBreak ;
 	
 
     public WaiterGui(WaiterAgent agent,RestaurantGui gui) {
+    	onBreak = false;
         this.agent = agent;
         tablelist[0]=100;
     	tablelist[1]=200;
@@ -71,11 +72,19 @@ public class WaiterGui implements Gui {
 		isPresent = p;
 	}
     public void setBreak(){
-		onBreak = true;
 		agent.wantsaBreak();
-		setPresent(true);
+		//setPresent(true);
+	}
+    public void reset(){
+		onBreak = false;
+		//setPresent(true);
+	}
+    public void set(){
+		onBreak = true;
+		//setPresent(true);
 	}
 	public boolean onBreak() {
+	
 		return onBreak;
 	}
     public void DoBringToTable( int b){
