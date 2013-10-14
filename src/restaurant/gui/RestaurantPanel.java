@@ -25,7 +25,7 @@ public class RestaurantPanel extends JPanel {
 	private MarketAgent market = new MarketAgent("Winn-Dixie");
 	private MarketAgent market2 = new MarketAgent("Target");
 	private MarketAgent market3 = new MarketAgent("Chanel");
-	private CookAgent cook = new CookAgent();
+	private CookAgent cook = new CookAgent(15,15,15,15);
 	private CashierAgent cashier = new CashierAgent();
 	private HostGui hostGui = new HostGui(host);
 
@@ -146,6 +146,14 @@ public class RestaurantPanel extends JPanel {
 			customers.add(c);
 			if (hungry==true){
 				c.getGui().setHungry();
+			}
+			if(name.equals("chicken")){
+				System.out.println("OUT OF STOCK SENARIO");
+				c.hack_chicken();
+			}
+			if(name.equals("salad")){
+				System.out.println("CUSTOMER LEAVES AFTER CHEAPEST ITEM OUT OF STOCK SENARIO");
+				c.hack_salad();
 			}
 			c.startThread();
 		}

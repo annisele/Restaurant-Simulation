@@ -31,7 +31,8 @@ public class CustomerAgent extends Agent {
 	private WaiterAgent waiter;
 	private CashierAgent cashier;
 	private CookAgent cook;
-	private boolean good_call;
+	private boolean hack_c;
+	private boolean hack_s;
 	//    private boolean isHungry = false; //hack for gui
 	public enum AgentState
 	{DoingNothing, WaitingInRestaurant, BeingSeated, Seated, WaitingForWaiter,  WaitingForFood, Reordered,readytopay, Eating, DoneEating, Leaving};
@@ -50,6 +51,8 @@ public class CustomerAgent extends Agent {
 	public CustomerAgent(String name){
 		super();
 		this.name = name;
+		hack_c=false;
+		hack_s=false;
 		double temp= 5+(double)(Math.random()*(15));
 		DecimalFormat f =new DecimalFormat("##.00");
 		String formate=f.format(temp);
@@ -78,7 +81,15 @@ public class CustomerAgent extends Agent {
 	public void setCashier(CashierAgent cashier) {
 		this.cashier = cashier;
 	}
-
+	public void hack_chicken(){
+		hack_c=true;
+		cook.hack_chicken();
+	}
+	public void hack_salad(){
+		hack_s=true;
+		cashmoney=6;
+		cook.hack_salad();
+	}
 	public String getCustomerName() {
 		return name;
 	}
@@ -173,6 +184,10 @@ public class CustomerAgent extends Agent {
 		}
 		if (state ==  AgentState.WaitingForWaiter && event == AgentEvent.ordered){
 			state = AgentState.WaitingForFood;
+			if (hack_c==true){
+				Order("chicken");
+			}
+			else{
 			if (cashmoney>=6){
 			choice=g_choice();
 			if(choice.equals("nooo")){
@@ -181,6 +196,7 @@ public class CustomerAgent extends Agent {
 			}
 			Order(choice);
 			return true;
+			}
 			}
 		}
 

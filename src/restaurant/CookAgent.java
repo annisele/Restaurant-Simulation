@@ -46,7 +46,7 @@ public class CookAgent extends Agent {
 		}
 	}
 	int x;
-	public inventory v= new inventory(15,x,15,15);
+	public inventory v;
 	public class order{
 		WaiterAgent w;
 		String choice;
@@ -74,8 +74,9 @@ public class CookAgent extends Agent {
 	}
 	// Messages
 	
-	public CookAgent(){
+	public CookAgent(int st,int ch,int sa,int pi){
 		super();
+		v= new inventory(st,ch,sa,pi);
 		this.name="Cook";
 		cooking=false;
 	Menu.put("chicken",10.99);	
@@ -87,7 +88,12 @@ public class CookAgent extends Agent {
 	public String getName() {
 		return name;
 	}
-
+	public void hack_chicken(){
+		v.chicken=0;
+	}
+	public void hack_salad(){
+		v.salad=0;
+	}
 	public void msgCookOrder(WaiterAgent w, int tnum, String choice) {
 		Do("Recieve msg to cook order");
 		//waiter=w;
@@ -110,8 +116,8 @@ public class CookAgent extends Agent {
 	
 	public void msgHereAreItems(String item){
 		Do("Recieved msg items are restocked");
-		if(item.equals("steak")){
-			v.steak=+10;
+				v.steak=+10;
+				if(item.equals("steak")){
 			v.steak_low=false;
 			if(v.steak_gone==true){
 				addToMenu("steak");
@@ -189,8 +195,11 @@ public class CookAgent extends Agent {
 				}
 			return true;
 			}
-			else
+			else{
+				callMarket(c);
+			Do("order chicken !!!!");
 			return false;
+			}
 		}
 			
 		if (c.equals("steak")){
@@ -202,8 +211,10 @@ public class CookAgent extends Agent {
 			}
 			return true;
 		}
-		else
+		else{
+			callMarket(c);
 			return false;
+		}
 		}
 			
 		if (c.equals( "salad")){
@@ -215,8 +226,10 @@ public class CookAgent extends Agent {
 			}
 			return true;
 		}
-		else
+		else{
+			callMarket(c);
 			return false;
+		}
 		}
 		if (c.equals( "pizza")){
 			if (v.pizza!=0){
@@ -228,7 +241,10 @@ public class CookAgent extends Agent {
 			return true;
 		}
 		else
+		{
+			callMarket(c);
 			return false;
+		}
 		}
 		return false;
 	}
