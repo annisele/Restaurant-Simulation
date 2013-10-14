@@ -11,5 +11,6 @@
   
 #####compile in Eclipse by hitting run.
 
-#####all agents run in sync and concurrent. However,at some points the waiter and the customer does not recieve gototable 
-#####message at the same time so the waiter does not always "lead" the customer to the table.
+###type in "chicken" to see reorder function. first item is out of stock, menu is updated and customer reorders
+###"salad" to see customer leaving after only having enough money to order cheapest item, but item ran out of stock.
+###"steak" to see customer order a out of stock item, cook calls out of stock market, calls a second maket.
