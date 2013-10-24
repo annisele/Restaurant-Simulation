@@ -2,6 +2,8 @@ package restaurant;
 
 import restaurant.WaiterAgent.mycustomer;
 import restaurant.gui.CustomerGui;
+import restaurant.interfaces.Cashier;
+import restaurant.interfaces.Customer;
 import agent.Agent;
 
 import java.text.DecimalFormat;
@@ -14,7 +16,7 @@ import java.util.TimerTask;
 /**
  * Restaurant customer agent.
  */
-public class CustomerAgent extends Agent {
+public class CustomerAgent extends Agent implements Customer {
 	
 	
 	private int tnum,lowestprice;
@@ -29,7 +31,7 @@ public class CustomerAgent extends Agent {
 	// agent correspondents
 	private HostAgent host;
 	private WaiterAgent waiter;
-	private CashierAgent cashier;
+	private Cashier cashier;
 	private CookAgent cook;
 	private boolean hack_c=false;
 	private boolean hack_s=false;
@@ -150,6 +152,9 @@ public class CustomerAgent extends Agent {
 			customer_check=cashmoney;
 		event = AgentEvent.paying;
 		stateChanged();
+	}
+	public void msgTEST(){
+		Do("test");
 	}
 	public void msgPaying() {
 		//from animation

@@ -1,5 +1,6 @@
 package restaurant;
-
+import restaurant.interfaces.*;
+import restaurant.interfaces.Cashier;
 import agent.Agent;
 import restaurant.CustomerAgent.AgentEvent;
 import restaurant.CustomerAgent.AgentState;
@@ -29,7 +30,7 @@ public List <mycustomer>customers
 public Map<String,Double> Menu= new HashMap<String, Double>();
 private HostAgent host;
 private CookAgent cook;
-private CashierAgent cashier;
+private Cashier cashier;
 enum CustomerState{
 	waiting,seated,asked, readytoorder, askedtoorder,ordered, 
 	waitingfororder, mustreorder, pend, waitingforfood, eating, 

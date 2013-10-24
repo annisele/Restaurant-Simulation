@@ -5,6 +5,9 @@ import restaurant.MarketAgent;
 import restaurant.CookAgent.OrderState;
 import restaurant.CustomerAgent.AgentEvent;
 import restaurant.gui.HostGui;
+import restaurant.interfaces.*;
+
+import restaurant.interfaces.Cashier;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;
@@ -16,10 +19,11 @@ import java.util.concurrent.Semaphore;
 //does all the rest. Rather than calling the other agent a waiter, we called him
 //the HostAgent. A Host is the manager of a restaurant who sees that all
 //is proceeded as he wishes.
-public class CashierAgent extends Agent {
+public class CashierAgent extends Agent implements Cashier {
 	
 	
 	private WaiterAgent waiter;
+	private CustomerAgent cust;
 	int revenue;
 	public List<order> cashiers_list
 	= new ArrayList<order>();
@@ -29,11 +33,11 @@ public class CashierAgent extends Agent {
 	public class order{
 		int cost;
 		String choice;
-		CustomerAgent cust;
+		Customer cust;
 		double payment,debt;
 		OrderState state;
 		
-		order(CustomerAgent c, String item ){
+		order(Customer c, String item ){
 		cust=c;
 		choice=item;
 		debt=0;
@@ -49,6 +53,9 @@ public class CashierAgent extends Agent {
 	public void setWaiter(WaiterAgent waitr) {
 		this.waiter = waitr;
 	}
+	public void setCustomer(CustomerAgent c) {
+		this.cust = c;
+	}
 	// Messages
 	
 	public CashierAgent(){
@@ -61,15 +68,16 @@ public class CashierAgent extends Agent {
 		
 	}
 
-	
-	public void msgCustomerOrder(CustomerAgent c, String ch) {
+	@Override
+	public void msgCustomerOrder(Customer c, String ch) {
 		Do("Recieved customer order");
 		order o= new order(c,ch);
 		o.state= OrderState.adding;
 		cashiers_list.add(o);
 		stateChanged();
 	}
-	public double msgGetCheck(CustomerAgent c){
+	@Override
+	public double msgGetCheck(Customer c){
 		Do("Giving check to waiter");
 		for(order current: cashiers_list){
 			if(current.cust==c){
@@ -78,7 +86,9 @@ public class CashierAgent extends Agent {
 	}
 		return 0;
 	}
-	public void msgHereIsMoney(CustomerAgent c, Double m){
+	
+	@Override
+	public void msgHereIsMoney(Customer c, Double m){
 		Do("Recieved money from cust");
 		CheckPayment(c,m);
 		stateChanged();
@@ -87,7 +97,7 @@ public class CashierAgent extends Agent {
 	 * Scheduler.  Determine what action is called for, and do it.
 	 * @return 
 	 */
-	protected boolean pickAndExecuteAnAction() {
+	public boolean pickAndExecuteAnAction() {
 		/* Think of this next rule as:
             Does there exist a table and customer,
             so that table is unoccupied and customer is waiting.
@@ -122,6 +132,7 @@ public class CashierAgent extends Agent {
 	
 	private void CreateCheck(order o){
 		Do("creating check ");
+		//cust.msgTEST();
 		for(order current: cashiers_list){
 			if(current==o){
 	current.payment=Menu.get(o.choice);
@@ -132,7 +143,7 @@ public class CashierAgent extends Agent {
 		}
 		
 	}
-	private void CheckPayment(CustomerAgent c,double m){
+	private void CheckPayment(Customer c,double m){
 		Do("checking payment");
 		for(order current: cashiers_list){
 			if(current.cust==c){
@@ -155,6 +166,10 @@ public class CashierAgent extends Agent {
 		Do("Customer "+ o.cust+ "is in debt");
 		bad_orders.add(o);
 	}
+
+
+
+	
 	
 	
 	
