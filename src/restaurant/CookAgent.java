@@ -19,10 +19,11 @@ public class CookAgent extends Agent {
 	
 	
 	private WaiterAgent waiter;
+	private static int num_items =10;
 	public List<MarketAgent> markets
 	= new ArrayList<MarketAgent>();
 	public Map<String,Double> Menu= new HashMap<String, Double>();
-
+	
 	public class inventory{
 		int steak;
 		boolean steak_low=false;
@@ -120,8 +121,8 @@ public class CookAgent extends Agent {
 	
 	public void msgHereAreItems(String item){
 		Do("Recieved msg items are restocked");
-				v.steak=+10;
 				if(item.equals("steak")){
+					v.steak=+10;
 			v.steak_low=false;
 			if(v.steak_gone==true){
 				addToMenu("steak");
@@ -174,7 +175,7 @@ public class CookAgent extends Agent {
 			}
 			if (o.state == OrderState.notready) {
 				cooking= false;
-				Do("why");
+				Do("No Iventory, Customer must reorder");
 				notcool(o, o.table);
 				return true;
 			}
@@ -206,7 +207,6 @@ public class CookAgent extends Agent {
 			}
 			else{
 				callMarket(c);
-			Do("order chicken !!!!");
 			return false;
 			}
 		}
@@ -236,7 +236,7 @@ public class CookAgent extends Agent {
 			return true;
 		}
 		else{
-			//callMarket(c);
+			callMarket(c);
 			return false;
 		}
 		}
@@ -298,6 +298,7 @@ public class CookAgent extends Agent {
 	}
 	private void removeFromMenu(String choice){
 		Menu.remove(choice);
+		Do(""+choice+" has been removed from Menu.");
 		if(choice.equals("steak")){
 			v.steak_gone=true;
 		}
@@ -312,6 +313,7 @@ public class CookAgent extends Agent {
 		}
 	}
 	private void addToMenu(String choice){
+		Do(""+choice+" has been added to Menu");
 		if(choice.equals("steak")){
 			Menu.put("steak",15.99);
 			v.steak_gone=false;
@@ -332,7 +334,7 @@ public class CookAgent extends Agent {
 	private void callMarket(String item){
 		Do("ordering from market "+c_market);
 	
-		markets.get(c_market).msgLowOnItem(this, item);
+		markets.get(c_market).msgLowOnItem(this, item, num_items);
 		
 	}
 	

@@ -51,10 +51,11 @@ public class RestaurantPanel extends JPanel {
 		
 		host.startThread();
 		cook.startThread();
+		
 		cashier.startThread();
-		/*this.addPerson("Waiter", "waiter 1", false);
-        this.addPerson("Waiter", "waiter 2", false);
-        this.addPerson("Waiter", "waiter 3", false);*/
+		market.setCashier(cashier);
+		market2.setCashier(cashier);
+		market3.setCashier(cashier);
 		cook.addMarket(market);
 		cook.addMarket(market2);
 		cook.addMarket(market3);

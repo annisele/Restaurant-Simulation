@@ -262,7 +262,7 @@ class mycustomer {
 					
 					if(w_at_lobby==true){
 						c.state=CustomerState.waitingfororder;
-						DeliverOrder(c,c.table_num,c.choice);
+						DeliverOrder(c);
 						return true;
 					}
 					
@@ -373,14 +373,14 @@ public void TakeOrder (mycustomer c){
 	
 }
 //reorder function
-public void DeliverOrder (mycustomer c, int tnum, String choice){
+public void DeliverOrder (mycustomer c){
  
  try {
 		atLobby.acquire();
 	} catch (InterruptedException e) {
 		e.printStackTrace();
 	}
- cook.msgCookOrder(this, tnum, choice);
+ cook.msgCookOrder(this, c.table_num, c.choice);
 }
 public void GettingFood(mycustomer c){
 	Do("waiter is picking up order");

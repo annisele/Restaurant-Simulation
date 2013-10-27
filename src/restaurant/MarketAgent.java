@@ -20,6 +20,7 @@ public class MarketAgent extends Agent {
 	
 	String name;
 	private CookAgent cook;
+	private CashierAgent cashier;
 	public class inventory{
 		int steak;
 		int chicken;
@@ -39,7 +40,17 @@ public class MarketAgent extends Agent {
 	{ none, ordering, loading, finished };
 	OrderStatus status=OrderStatus.none;
 	Timer timer = new Timer();
-	public Deque <String> items= new LinkedList<String>();
+	private class item{
+	String item;
+	int unit;
+	double payment;
+	
+	item(String n, int u){
+		item=n;
+		unit= u;
+	}
+	}
+	public Deque <item> items= new LinkedList<item>();
 
 	
 	
@@ -53,16 +64,20 @@ public class MarketAgent extends Agent {
 	public String getname(){
 		return name;
 	}
-	public void msgLowOnItem(CookAgent c, String item){
-		Do("Recieved msg that "+item+" is low");
+	public void msgLowOnItem(CookAgent c, String food, int order_num){
+		Do("Recieved msg that cook needs "+food);
 		setCook(c);
-		if(checkorder(item)==true){
-			items.addFirst(item);
+		item temp= new item(food,order_num);
+		if(checkorder(temp)==true){
+			items.addFirst(temp);
+			Do("here: "+ items.getFirst().item);
 			status= OrderStatus.ordering;
 			stateChanged();	
+			temp=null;
 		}
 		else
-			noInventory(item);
+			noInventory(food);
+			temp=null;
 	}
 
 	public void hack_steak(){
@@ -80,7 +95,7 @@ public class MarketAgent extends Agent {
             If so seat him at the table.
 		 */
 		if(status==OrderStatus.ordering){
-			status= OrderStatus.finished;
+			status=OrderStatus.finished;
 			timer.schedule(new TimerTask(){
 				
 				Object cookie = 1;
@@ -91,47 +106,54 @@ public class MarketAgent extends Agent {
 					
 					Do(""+status);
 					
-					
 				}
 			}, 1000);
+			
 			return true;
 			}
-		else
-		return false;
+	/*	if(status==OrderStatus.finished){
+			items.removeFirst();
+			return true;
+		}*/
 		
+		return false;
 	}
 
 	// Actions
-	private boolean checkorder(String c){
-		if (c.equals( "chicken")) {
+	private boolean checkorder(item t){
+		if (t.item.equals( "chicken")) {
 			if (v.chicken!=0){
-			v.chicken-=10;
+			v.chicken-=t.unit;
+			t.payment=10.99*t.unit;
 			return true;
 			}
 			else
 			return false;
 		}
 			
-		if (c.equals("steak")){
+		if (t.item.equals("steak")){
 			if (v.steak!=0){
-				v.steak-=10;
+				v.steak-=t.unit;
+				t.payment=15.99*t.unit;
 			return true;
 		}
 		else
 			return false;
 		}
 			
-		if (c.equals( "salad")){
+		if (t.item.equals( "salad")){
 			if (v.salad!=0){
-			v.salad-=10;
+			v.salad-=t.unit;
+			t.payment=5.99*t.unit;
 			return true;
 		}
 		else
 			return false;
 		}
-		if (c.equals( "pizza")){
+		if (t.item.equals( "pizza")){
 			if (v.pizza!=0){
-			v.pizza-=10;
+			v.pizza-=t.unit;
+			t.payment=8.99*t.unit;
 			return true;
 		}
 		else
@@ -145,13 +167,19 @@ public class MarketAgent extends Agent {
 		
 	}
 	private void Restock(){
-		String item= items.getFirst();
-		Do("RESTOCKED: "+item);
-		cook.msgHereAreItems(item);
-		stateChanged();
+		item ordered_item= items.getLast();
+		Do("Delivering: "+ordered_item.item);
+		cook.msgHereAreItems(ordered_item.item);
+		cashier.msgHereIsBill(ordered_item.payment);
+		items.removeLast();
+		
 	}
 	private void setCook(CookAgent cook2) {
 		this.cook=cook2;
+		
+	}
+	public void setCashier(CashierAgent cash2) {
+		this.cashier=cash2;
 		
 	}
 	

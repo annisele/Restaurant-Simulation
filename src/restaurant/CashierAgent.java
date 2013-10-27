@@ -29,7 +29,7 @@ public class CashierAgent extends Agent implements Cashier {
 	= new ArrayList<order>();
 	public List<order> bad_orders
 	= new ArrayList<order>();
-	public Map<String,Double> Menu= new HashMap<String, Double>();
+	private Map<String,Double> Menu= new HashMap<String, Double>();
 	public class order{
 		int cost;
 		String choice;
@@ -62,7 +62,7 @@ public class CashierAgent extends Agent implements Cashier {
 		super();
 		revenue=0;
 		Menu.put("chicken",10.99);	
-		Menu.put("skeak",15.99);
+		Menu.put("steak",15.99);
 		Menu.put("salad",5.99);
 		Menu.put("pizza",8.99);
 		
@@ -70,9 +70,10 @@ public class CashierAgent extends Agent implements Cashier {
 
 	@Override
 	public void msgCustomerOrder(Customer c, String ch) {
-		Do("Recieved customer order");
+		Do("Recieved "+c.getCustomerName()+"'s "+ch+" order");
 		order o= new order(c,ch);
 		o.state= OrderState.adding;
+		Do("order: "+o.choice+" cust: "+o.cust);
 		cashiers_list.add(o);
 		stateChanged();
 	}
@@ -86,7 +87,19 @@ public class CashierAgent extends Agent implements Cashier {
 	}
 		return 0;
 	}
-	
+	public void msgHereIsBill(Double p){
+		Do("Recieve bill from market");
+		if(revenue>=p){
+		revenue-=p;
+		Do("Market has been paid in full.");
+		}
+		else{
+			revenue=0;
+			double m_debt= p-revenue;
+			Do("Casier owes $"+m_debt);
+		}
+		
+	}
 	@Override
 	public void msgHereIsMoney(Customer c, Double m){
 		Do("Recieved money from cust");
@@ -131,18 +144,15 @@ public class CashierAgent extends Agent implements Cashier {
 	
 	
 	private void CreateCheck(order o){
-		Do("creating check ");
 		//cust.msgTEST();
-		for(order current: cashiers_list){
-			if(current==o){
-	current.payment=Menu.get(o.choice);
-	Do(""+o.cust+ "needs to pay: "+current.payment);
-	current.state= OrderState.waiting;
+	o.payment=Menu.get(o.choice);
+	Do("creating $"+o.payment+" check for "+o.cust);
+	o.state= OrderState.waiting;
 	stateChanged();
 			}
-		}
 		
-	}
+		
+	
 	private void CheckPayment(Customer c,double m){
 		Do("checking payment");
 		for(order current: cashiers_list){

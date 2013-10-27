@@ -103,12 +103,7 @@ public class CustomerAgent extends Agent implements Customer {
 
 	public void gotHungry() {//from animation
 		print("I'm hungry");
-		if(hack_s==true){
-			cashmoney=6;
-		}
-		if(hack_st==true){
-			cashmoney=18;
-		}
+	
 		event = AgentEvent.gotHungry;
 		stateChanged();
 	}
@@ -153,9 +148,7 @@ public class CustomerAgent extends Agent implements Customer {
 		event = AgentEvent.paying;
 		stateChanged();
 	}
-	public void msgTEST(){
-		Do("test");
-	}
+	
 	public void msgPaying() {
 		//from animation
 		Do("paying"+state);
@@ -189,6 +182,13 @@ public class CustomerAgent extends Agent implements Customer {
 		}
 		if (state == AgentState.BeingSeated && event == AgentEvent.seated){
 			state = AgentState.Seated;
+			if(hack_s==true){
+				cashmoney=6;
+				Do("money: "+cashmoney);
+			}
+			if(hack_st==true){
+				cashmoney=18;
+			}
 			LookingAtMenu();
 			return true;
 		}
@@ -199,9 +199,7 @@ public class CustomerAgent extends Agent implements Customer {
 		}
 		if (state ==  AgentState.WaitingForWaiter && event == AgentEvent.ordered){
 			state = AgentState.WaitingForFood;
-			if (hack_s==true){
-				lowestprice=9;
-			}
+			
 			if (hack_c==true){
 				Order("chicken");
 			}
@@ -215,6 +213,7 @@ public class CustomerAgent extends Agent implements Customer {
 			if(choice.equals("nooo")){
 				Leave();
 				state=AgentState.Leaving;
+				return false;
 			}
 			Order(choice);
 			return true;
@@ -298,8 +297,8 @@ public class CustomerAgent extends Agent implements Customer {
 				Double r_val = (Double) values[g.nextInt(values.length)];
 				Do("making choice: "+r_val);
 				Do("cash: "+cashmoney);
-				if (r_val==11.99){
-					if(cashmoney>=12){
+				if (r_val==10.99){
+					if(cashmoney>=11){
 						choice="chicken";
 						break;
 					}
@@ -331,7 +330,7 @@ public class CustomerAgent extends Agent implements Customer {
 			if(temp==4||temp==5||temp==6||temp==7||hack_s==true){
 				Do("customer is angry and leaving the restaurant because "
 						+ "ze cannot pay");
-				return "nooo";
+				return "not ordering";
 			}
 			else if(temp==0){
 				choice="steak";
@@ -361,8 +360,19 @@ public class CustomerAgent extends Agent implements Customer {
 		if(hack_st==true){
 			hack_st=false;
 		}
+		if (hack_s==true){
+			lowestprice=9;
+		}
 		String c= g_choice();
-		waiter.msgHereIsMyChoice(this, c);
+		if(c.equals("not ordering")){
+			Do("here");
+			Leave();
+			state=AgentState.Leaving;
+			stateChanged();
+		}
+		else{
+			waiter.msgHereIsMyChoice(this, c);
+		}
 	}
 	private void EatFood() {
 		Do("Eating Food");
