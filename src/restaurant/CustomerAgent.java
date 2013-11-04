@@ -2,6 +2,7 @@ package restaurant;
 
 import restaurant.WaiterAgent.mycustomer;
 import restaurant.gui.CustomerGui;
+//import restaurant.gui.CustomerGui.Command;
 import restaurant.interfaces.Cashier;
 import restaurant.interfaces.Customer;
 import agent.Agent;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Map.Entry;
 
 /**
  * Restaurant customer agent.
@@ -19,7 +21,7 @@ import java.util.TimerTask;
 public class CustomerAgent extends Agent implements Customer {
 	
 	
-	private int tnum,lowestprice;
+	private int waitingPosition, tnum,lowestprice;
 	private double cashmoney, customer_check;
 	
 	private String name, choice;
@@ -38,7 +40,7 @@ public class CustomerAgent extends Agent implements Customer {
 	private boolean hack_st=false;
 	//    private boolean isHungry = false; //hack for gui
 	public enum AgentState
-	{DoingNothing, WaitingInRestaurant, BeingSeated, Seated, WaitingForWaiter,  WaitingForFood, Reordered,readytopay, Eating, DoneEating, Leaving};
+	{DoingNothing, WaitingInRestaurant, BeingSeated, Seated, WaitingForWaiter,  WaitingForFood, Reordered,readytopay, Eating, DoneEating, Leaving, Storming};
 	private AgentState state = AgentState.DoingNothing;//The start state
 
 	public enum AgentEvent 
@@ -122,6 +124,7 @@ public class CustomerAgent extends Agent implements Customer {
 		stateChanged();
 	}
 	public void msgWhatsYourOrder(){
+		Do("Recieved msg what is your order");
 		event = AgentEvent.ordered;
 		
 		stateChanged();
@@ -183,7 +186,7 @@ public class CustomerAgent extends Agent implements Customer {
 		if (state == AgentState.BeingSeated && event == AgentEvent.seated){
 			state = AgentState.Seated;
 			if(hack_s==true){
-				cashmoney=6;
+				cashmoney=4;
 				Do("money: "+cashmoney);
 			}
 			if(hack_st==true){
@@ -194,12 +197,25 @@ public class CustomerAgent extends Agent implements Customer {
 		}
 		if (state == AgentState.Seated && event == AgentEvent.readytoOrder){
 			state = AgentState.WaitingForWaiter;
+
+
+			Do("LOW "+lowestprice);
+			Do("$"+cashmoney);
+			choice=g_choice();
+			if(choice.equals("not ordering")){
+				Leave();
+				state=AgentState.Storming;
+				return false;
+				}
 			CallWaiter();
+
 			return true;
 		}
+
+
 		if (state ==  AgentState.WaitingForWaiter && event == AgentEvent.ordered){
 			state = AgentState.WaitingForFood;
-			
+
 			if (hack_c==true){
 				Order("chicken");
 			}
@@ -207,17 +223,10 @@ public class CustomerAgent extends Agent implements Customer {
 				Order("steak");
 			}
 			if(hack_st==false&&hack_c==false){
-				Do("LOW "+lowestprice);
-				Do("$"+cashmoney);
-			choice=g_choice();
-			if(choice.equals("nooo")){
-				Leave();
-				state=AgentState.Leaving;
-				return false;
+				Order(choice);
 			}
-			Order(choice);
 			return true;
-			}
+
 		}
 
 		if (state ==  AgentState.WaitingForFood && event == AgentEvent.x){
@@ -264,13 +273,31 @@ public class CustomerAgent extends Agent implements Customer {
 
 	private void goToRestaurant() {
 		Do("Going to restaurant");
-		host.msgIWantFood(this);//send our instance, so he can respond to us
-		
+		if(host.waitingSpots.containsValue(false)){
+			synchronized(host.waitingSpots){
+			for(Entry<Integer, Boolean> entry : host.waitingSpots.entrySet()){
+				if(entry.getValue()==false){
+					waitingPosition=entry.getKey();
+					host.waitingSpots.put(waitingPosition, true);
+					customerGui.DoGoToRestaurant(waitingPosition);
+					host.msgIWantFood(this);
+					break;
+				}
+			}
+			}
+		//send our instance, so he can respond to us
+		}
+		//Do(""+host.waitingSpots.entrySet());
+		else{
+		Do("Restaurant is full and I am leaving!");
+			Leave();
+		}
 	}
 
 	private void SitDown() {
 		Do("Being seated. Going to table");
-		customerGui.DoGoToSeat(tnum);//hack; only one table
+		customerGui.DoGoToSeat(tnum);//hack; only osne table
+		host.waitingSpots.put(waitingPosition, false);
 	}
 	private void LookingAtMenu(){
 		Do("Looking at Menu");
@@ -364,6 +391,7 @@ public class CustomerAgent extends Agent implements Customer {
 			lowestprice=9;
 		}
 		String c= g_choice();
+		Do("here"+ g_choice());
 		if(c.equals("not ordering")){
 			Do("here");
 			Leave();
@@ -400,7 +428,7 @@ public class CustomerAgent extends Agent implements Customer {
 	}
 	private void LeaveToPay() {
 		Do("Leaving to pay.");
-		customerGui.DoExitRestaurant();
+		customerGui.DoLeaveToPay();
 		
 	}
 	private void AtCashiers(){
@@ -412,11 +440,13 @@ public class CustomerAgent extends Agent implements Customer {
 		
 	}
 	private void Leave(){
-		event=AgentEvent.doneLeaving;
-		customerGui.DoExitRestaurant();
+		if(state==AgentState.Storming){
 		waiter.msgCustLeave(this);
 		host.msgLeavingTable(this);
-		Do("customer "+this+" has left");
+		}
+		event=AgentEvent.doneLeaving;
+		customerGui.DoExitRestaurant();
+		Do("Has left");
 	}
 	// Accessors, etc.
 

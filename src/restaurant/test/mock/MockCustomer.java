@@ -12,7 +12,7 @@ import restaurant.interfaces.*;
 public class MockCustomer extends Mock implements Customer{
 	
 	public Cashier cashier; 
-	public EventLog log;
+	//public EventLog log;
 	public MockCustomer(String name){
 		super(name);
 	}
@@ -89,7 +89,7 @@ public void setWaiter(WaiterAgent waitr){
 	}
 	@Override
 	public  void msgHereIsCheck(double c) {
-		  log.add(new LoggedEvent("Received HereIsYourTotal from cashier"));
+		  log.add(new LoggedEvent("Received check from cashier"));
 /*
 	        if(this.name.toLowerCase().contains("thief")){
 	                //test the non-normative scenario where the customer has no money if their name contains the string "theif"

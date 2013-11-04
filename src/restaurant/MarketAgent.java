@@ -5,6 +5,7 @@ import restaurant.CookAgent.OrderState;
 import restaurant.CookAgent.order;
 import restaurant.CustomerAgent.AgentEvent;
 import restaurant.gui.HostGui;
+import restaurant.interfaces.Market;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;
@@ -16,7 +17,7 @@ import java.util.concurrent.Semaphore;
 //does all the rest. Rather than calling the other agent a waiter, we called him
 //the HostAgent. A Host is the manager of a restaurant who sees that all
 //is proceeded as he wishes.
-public class MarketAgent extends Agent {
+public class MarketAgent extends Agent implements Market{
 	
 	String name;
 	private CookAgent cook;
@@ -58,10 +59,10 @@ public class MarketAgent extends Agent {
 	
 	public MarketAgent(String store_name){
 		super();
-		store_name=name;
+		name=store_name;
 		
 	}
-	public String getname(){
+	public String getName(){
 		return name;
 	}
 	public void msgLowOnItem(CookAgent c, String food, int order_num){
@@ -170,7 +171,7 @@ public class MarketAgent extends Agent {
 		item ordered_item= items.getLast();
 		Do("Delivering: "+ordered_item.item);
 		cook.msgHereAreItems(ordered_item.item);
-		cashier.msgHereIsBill(ordered_item.payment);
+		cashier.msgHereIsBill(this,ordered_item.payment);
 		items.removeLast();
 		
 	}

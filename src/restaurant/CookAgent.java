@@ -3,7 +3,8 @@ package restaurant;
 import agent.Agent;
 import restaurant.MarketAgent;
 import restaurant.CustomerAgent.AgentEvent;
-import restaurant.gui.HostGui;
+import restaurant.gui.CookGui;
+import restaurant.gui.CustomerGui;
 
 import java.util.*;
 import java.util.concurrent.Semaphore;
@@ -21,7 +22,7 @@ public class CookAgent extends Agent {
 	private WaiterAgent waiter;
 	private static int num_items =10;
 	public List<MarketAgent> markets
-	= new ArrayList<MarketAgent>();
+	= Collections.synchronizedList(new ArrayList<MarketAgent>());
 	public Map<String,Double> Menu= new HashMap<String, Double>();
 	
 	public class inventory{
@@ -62,7 +63,7 @@ public class CookAgent extends Agent {
 		}
 	}
 	
-	public List <order> orders= new ArrayList<order>();
+	public List <order> orders= Collections.synchronizedList(new ArrayList<order>());
 	public enum OrderState
 	{ prep, notready, done };
 	public int num=0;
@@ -70,8 +71,13 @@ public class CookAgent extends Agent {
 	String name;
 	private boolean cooking=false;
 	private int c_market=0;
+	public CookGui cookGui;
+	
 	public void setWaiter(WaiterAgent waitr) {
 		this.waiter = waitr;
+	}
+	public void setGui(CookGui g) {
+		cookGui = g;
 	}
 	// Messages
 	
@@ -167,6 +173,7 @@ public class CookAgent extends Agent {
             If so seat him at the table.
 		 */
 		if(cooking==false){
+			synchronized(orders){
 		for (order o : orders) {
 			if (o.state == OrderState.prep) {
 				cooking= true;
@@ -182,11 +189,11 @@ public class CookAgent extends Agent {
 			
 			if (o.state == OrderState.done) {
 				PlateIt(o);
-				
 				return true;
 			}
 		}
 		
+		}
 		}
 		return false;
 	}
@@ -266,6 +273,7 @@ public class CookAgent extends Agent {
 	}
 	private void CookIt(order o){
 		Do(""+o.choice);
+		cookGui.Prep();
 		num=find(o);
 		timer.schedule(new TimerTask(){
 			Object cookie = 1;
@@ -280,16 +288,18 @@ public class CookAgent extends Agent {
 		
 	}
 	private int find(order o){
-		
+		synchronized(orders){
 		for(int i=0; i<orders.size();i++){
 			if( orders.get(i)==o){
 			return i;
 			}
 		}
+		}
 		return 0;
 	}
 	
 	private void PlateIt(order o){
+		cookGui.Plate();
 		setWaiter(o.w);
 		Do("done plating");
 		waiter.msgFoodReady(o.table);

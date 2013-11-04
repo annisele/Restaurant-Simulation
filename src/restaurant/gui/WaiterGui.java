@@ -11,8 +11,8 @@ public class WaiterGui implements Gui {
 
     private WaiterAgent agent = null;
     RestaurantGui gui;
-    private int xPos = -20, yPos = -20;//default waiter position
-    private int xDestination = -20, yDestination = -20;//default start position
+    private int xPos = 0, yPos = 20;//default waiter position
+    private int xDestination = 0, yDestination = 20;//default start position
     private int tablenum;
     
     public static final int xTable = 100;
@@ -55,9 +55,15 @@ public class WaiterGui implements Gui {
         	agent.w_at_table=false;
         
        if (xPos == xDestination && yPos == yDestination
-       		& (xDestination == -20) & (yDestination == -20)) {
+       		& (xDestination == 0) & (yDestination == 20)) {
           agent.msgAtLobby();
       }
+       else
+       	agent.w_at_lobby=false;
+       if (xPos == xDestination && yPos == yDestination
+          		& (xDestination == 330) & (yDestination == 300)) {
+             agent.msgAtKitchen();
+         }
     }
 
     public void draw(Graphics2D g) {
@@ -108,8 +114,12 @@ public class WaiterGui implements Gui {
     }
 
     public void DoLeaveCustomer() {
-        xDestination = -20;
-        yDestination = -20;
+        xDestination = 0;
+        yDestination = 20;
+    }
+    public void GoToKitchen() {
+        xDestination = 330;
+        yDestination = 300;
     }
 
     public int getXPos() {

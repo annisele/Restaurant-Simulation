@@ -19,6 +19,7 @@ public class HostAgent extends Agent {
 	//Notice that we implement waitingCustomers using ArrayList, but type it
 	//with List semantics.
 	public int waiternum;
+	public Map<Integer,Boolean> waitingSpots= new HashMap<Integer, Boolean>();
 	public List<CustomerAgent> waitingCustomers
 	= new ArrayList<CustomerAgent>();
 	public List<WaiterAgent> waiters
@@ -33,7 +34,10 @@ public class HostAgent extends Agent {
 
 	public HostAgent(String name) {
 		super();
-
+		waitingSpots.put(0,false);
+		waitingSpots.put(1,false);
+		waitingSpots.put(2,false);
+		waitingSpots.put(3,false);
 		this.name = name;
 		// make some tables
 		tables = new ArrayList<Table>(NTABLES);
@@ -124,14 +128,17 @@ public class HostAgent extends Agent {
 
 	private void assignWaiter(CustomerAgent customer,  Table t) {
 		//msgsitattable to waiter include tablenum 
-		Do("assign");
-		WaiterAgent w= waiters.get(currentwaiter);
-	
-		w.msgSeatCustomer(customer, t.tableNumber);
-		currentwaiter++;
-		if(currentwaiter>=waiters.size())
-			currentwaiter=0;
+		Do("assign "+currentwaiter);
 		
+	
+		waiters.get(currentwaiter).msgSeatCustomer(customer, t.tableNumber);
+		currentwaiter++;
+		Do("assign "+currentwaiter+" "+waiters.size());
+		if(currentwaiter>=waiters.size()){
+			currentwaiter=0;
+			Do("her");
+		}
+		Do("assign hey "+currentwaiter);
 		t.setOccupant(customer);
 		waitingCustomers.remove(customer);
 	}
@@ -150,7 +157,9 @@ public class HostAgent extends Agent {
 	}
 	
 	public void addWaiter(WaiterAgent we){
+		
 		waiters.add(we);
+		Do("added "+waiters.size());
 	}
 	private class Table {
 		CustomerAgent occupiedBy;

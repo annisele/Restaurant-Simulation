@@ -5,10 +5,11 @@ import restaurant.CookAgent;
 import restaurant.HostAgent;
 import restaurant.WaiterAgent;
 import restaurant.CustomerAgent.AgentEvent;
+import restaurant.test.mock.EventLog;
 
 public interface Customer {
 	
-	
+	EventLog log = new EventLog();
 	public abstract void setWaiter(WaiterAgent waitr);
 	
 	

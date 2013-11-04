@@ -22,13 +22,13 @@ public class RestaurantPanel extends JPanel {
 
 	//Host, cook, waiters and customers
 	private HostAgent host = new HostAgent("Sarah");
-	private MarketAgent market = new MarketAgent("Winn-Dixie");
-	private MarketAgent market2 = new MarketAgent("Target");
-	private MarketAgent market3 = new MarketAgent("Chanel");
+	private MarketAgent market = new MarketAgent("Market Winn-Dixie");
+	private MarketAgent market2 = new MarketAgent("Market Target");
+	private MarketAgent market3 = new MarketAgent("Marker Chanel");
 	private CookAgent cook = new CookAgent(15,15,15,15);
 	private CashierAgent cashier = new CashierAgent();
 	private HostGui hostGui = new HostGui(host);
-
+	private CookGui cookGui = new CookGui(cook);
 	private Vector<CustomerAgent> customers = new Vector<CustomerAgent>();
 	private Vector<WaiterAgent> waiters = new Vector<WaiterAgent>();
 
@@ -45,13 +45,12 @@ public class RestaurantPanel extends JPanel {
 		this.gui = gui;
 
 		host.setGui(hostGui);
-
+		cook.setGui(cookGui);
 
 		gui.animationPanel.addGui(hostGui);
-		
+		gui.animationPanel.addGui(cookGui);
 		host.startThread();
 		cook.startThread();
-		
 		cashier.startThread();
 		market.setCashier(cashier);
 		market2.setCashier(cashier);
@@ -59,6 +58,9 @@ public class RestaurantPanel extends JPanel {
 		cook.addMarket(market);
 		cook.addMarket(market2);
 		cook.addMarket(market3);
+		cashier.addMarket(market);
+		cashier.addMarket(market2);
+		cashier.addMarket(market3);
 		market.startThread();
 		market2.startThread();
 		market3.startThread();
@@ -173,7 +175,7 @@ public class RestaurantPanel extends JPanel {
 			w.setCook(cook);
 			w.setCashier(cashier);
 			w.setGui(g);
-
+					System.out.println("Odsfgsfdg");
 			waiters.add(w);
 			host.addWaiter(w);
 

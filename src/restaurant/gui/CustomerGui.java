@@ -4,6 +4,11 @@ import restaurant.CustomerAgent;
 import restaurant.HostAgent;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class CustomerGui implements Gui{
 
@@ -16,9 +21,8 @@ public class CustomerGui implements Gui{
 
 	private int xPos, yPos;
 	private int xDestination, yDestination;
-	private enum Command {noCommand, GoToSeat, LeaveRestaurant};
+	private enum Command {noCommand, GoToSeat, GoToRestaurant,LeaveRestaurant};
 	private Command command=Command.noCommand;
-
 	public static final int xTable = 100;
 	public static final int yTable = 150;
 	public static final int customer_rectsize =20;
@@ -29,6 +33,8 @@ public class CustomerGui implements Gui{
 		yPos = -40;
 		xDestination = -40;
 		yDestination = -40;
+	
+		
 		//maitreD = m;
 		this.gui = gui;
 	}
@@ -85,11 +91,24 @@ public class CustomerGui implements Gui{
 		yDestination = yTable;
 		command = Command.GoToSeat;
 	}
+	public void DoGoToRestaurant(int i) {//later you will map seatnumber to table coordinates.
+		
+					xDestination = i*25;
+					yDestination = 1;
+					
+					command = Command.GoToRestaurant;
+					
 
-	public void DoExitRestaurant() {
+	}
+	public void DoLeaveToPay() {
 		xDestination = 100;
 		yDestination = -40;
 		command = Command.LeaveRestaurant;
+	}
+	public void DoExitRestaurant() {
+		xDestination = 300;
+		yDestination = -40;
+		command = Command.noCommand;
 	}
 }
 

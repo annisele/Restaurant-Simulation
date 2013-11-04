@@ -3,6 +3,8 @@ package restaurant.test.mock;
 import java.util.LinkedList;
 import java.util.List;
 
+import restaurant.interfaces.Cashier;
+
 /**
  * This class should be used by Mock agents to log significant events. For
  * example, you might write a log entry every time a Mock receives a message.
@@ -17,7 +19,7 @@ public class EventLog {
         /**
          * This is the backing data store for the list of events.
          */
-        private LinkedList<LoggedEvent> events = new LinkedList<LoggedEvent>();
+        public LinkedList<LoggedEvent> events = new LinkedList<LoggedEvent>();
 
         /**
          * Add a new event to the log.
@@ -26,6 +28,7 @@ public class EventLog {
          */
         public void add(LoggedEvent e) {
                 events.add(e);
+              //  System.out.println("OUT "+events.size());
         }
 
         /**
@@ -53,8 +56,12 @@ public class EventLog {
          *         event. False otherwise.
          */
         public boolean containsString(String message) {
+
+        	//System.out.println("OUT "+events.size());
                 for (LoggedEvent e : events) {
+                	//System.out.println("OUT "+message+" "+e.getMessage());
                         if (e.getMessage().contains(message)) {
+             				
                                 return true;
                         }
                 }
