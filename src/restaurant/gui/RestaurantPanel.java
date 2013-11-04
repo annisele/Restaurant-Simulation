@@ -180,12 +180,11 @@ public class RestaurantPanel extends JPanel {
 			w.setCook(cook);
 			w.setCashier(cashier);
 			w.setGui(g);
-					System.out.println("Odsfgsfdg");
 			waiters.add(w);
 			host.addWaiter(w);
 			if(host.waiterSpots.containsValue(false)){
 				synchronized(host.waiterSpots){
-					System.out.println(" "+host.waiterSpots.entrySet());
+					
 				for(Entry<Integer, Boolean> entry : host.waiterSpots.entrySet()){
 						if(entry.getValue()==false){
 						w.setSpot(entry.getKey());

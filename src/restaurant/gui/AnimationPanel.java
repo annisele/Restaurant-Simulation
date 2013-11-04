@@ -30,7 +30,7 @@ public class AnimationPanel extends JPanel implements ActionListener {
         
         bufferSize = this.getSize();
  
-    	Timer timer = new Timer(3, this );
+    	Timer timer = new Timer(7, this );
     	timer.start();
     	 try {                
              bufferImage = ImageIO.read(new File("C:/Users/Lenovo/Pictures/kitchen.png"));

@@ -23,7 +23,7 @@ import java.util.concurrent.Semaphore;
 public class CashierAgent extends Agent implements Cashier {
 	
 	
-	private WaiterAgent wait;
+	 private WaiterAgent wait;
 	private CustomerAgent cust;
 	public double balance;
 	public List<mymarket> markets
