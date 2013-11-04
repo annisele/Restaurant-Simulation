@@ -55,7 +55,7 @@ public class WaiterGui implements Gui {
         	agent.w_at_table=false;
         
        if (xPos == xDestination && yPos == yDestination
-       		& (xDestination == 0) & (yDestination == 20)) {
+       		& (xDestination == agent.spot*25) & (yDestination == 20)) {
           agent.msgAtLobby();
       }
        else
@@ -65,7 +65,12 @@ public class WaiterGui implements Gui {
              agent.msgAtKitchen();
          }
     }
+    public void Start(int i) {//later you will map seatnumber to table coordinates.
+		
+		xDestination = i*25;
+		yDestination = 20;
 
+}
     public void draw(Graphics2D g) {
         g.setColor(Color.MAGENTA);
         g.fillRect(xPos, yPos, 20, 20);

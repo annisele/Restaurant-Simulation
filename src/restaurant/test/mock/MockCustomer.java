@@ -112,7 +112,20 @@ public void setWaiter(WaiterAgent waitr){
 		
 	}
 	@Override
+	public void msgGoodbye() {
+		 log.add(new LoggedEvent("Customer leaving"));
+		// TODO Auto-generated method stub
+		
+	}
+	/*@Override
 	public void msgAnimationFinishedLeaveRestaurant() {
+		// TODO Auto-generated method stub
+		
+	}*/
+
+
+	@Override
+	public void hack_mdebt() {
 		// TODO Auto-generated method stub
 		
 	}

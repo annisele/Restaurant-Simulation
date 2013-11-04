@@ -13,6 +13,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 /**
  * Panel in frame that contains all the restaurant information,
@@ -182,10 +183,25 @@ public class RestaurantPanel extends JPanel {
 					System.out.println("Odsfgsfdg");
 			waiters.add(w);
 			host.addWaiter(w);
-
+			if(host.waiterSpots.containsValue(false)){
+				synchronized(host.waiterSpots){
+					System.out.println(" "+host.waiterSpots.entrySet());
+				for(Entry<Integer, Boolean> entry : host.waiterSpots.entrySet()){
+						if(entry.getValue()==false){
+						w.setSpot(entry.getKey());
+						g.Start(entry.getKey());
+						host.waiterSpots.put(entry.getKey(), true);
+		
+						break;
+					}
+				}
+				}
+			}
 			w.startThread();
-		}
+		
 	}
+	}
+}
 
 	//use same function for cook and waiter
-}
+

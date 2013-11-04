@@ -12,7 +12,7 @@ import restaurant.interfaces.*;
 public class MockMarket extends Mock implements Market{
 	
 	public Cashier cashier; 
-	public EventLog log;
+
 	public MockMarket(String name){
 		super(name);
 	}
@@ -21,7 +21,11 @@ public class MockMarket extends Mock implements Market{
 	public void msgLowOnItem(CookAgent c, String food, int order_num){
 		
 	}
-	
+	@Override
+	public void msgHereIsMoney(double b) {
+		log.add(new LoggedEvent("market has recieved money"));
+		
+	}
 	@Override
 	public void setCashier(CashierAgent cashier) {
 		// TODO Auto-generated method stub

@@ -20,6 +20,8 @@ public class HostAgent extends Agent {
 	//with List semantics.
 	public int waiternum;
 	public Map<Integer,Boolean> waitingSpots= new HashMap<Integer, Boolean>();
+	public Map<Integer,Boolean> waiterSpots= new HashMap<Integer, Boolean>();
+	
 	public List<CustomerAgent> waitingCustomers
 	= new ArrayList<CustomerAgent>();
 	public List<WaiterAgent> waiters
@@ -27,7 +29,7 @@ public class HostAgent extends Agent {
 	public Collection<Table> tables;
 	//note that tables is typed with Collection semantics.
 	//Later we will see how it is implemented
-    private int currentwaiter=0;
+    public int currentwaiter=0;
 	private String name;
 
 	public HostGui hostGui = null;
@@ -38,6 +40,12 @@ public class HostAgent extends Agent {
 		waitingSpots.put(1,false);
 		waitingSpots.put(2,false);
 		waitingSpots.put(3,false);
+		waiterSpots.put(0,false);
+		waiterSpots.put(1,false);
+		waiterSpots.put(2,false);
+		waiterSpots.put(3,false);
+		waiterSpots.put(4,false);
+		waiterSpots.put(5,false);
 		this.name = name;
 		// make some tables
 		tables = new ArrayList<Table>(NTABLES);
@@ -136,7 +144,6 @@ public class HostAgent extends Agent {
 		Do("assign "+currentwaiter+" "+waiters.size());
 		if(currentwaiter>=waiters.size()){
 			currentwaiter=0;
-			Do("her");
 		}
 		Do("assign hey "+currentwaiter);
 		t.setOccupant(customer);

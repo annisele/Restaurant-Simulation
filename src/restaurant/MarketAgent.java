@@ -77,7 +77,7 @@ public class MarketAgent extends Agent implements Market{
 			temp=null;
 		}
 		else
-			noInventory(food);
+			noInventory(food, order_num);
 			temp=null;
 	}
 	public void msgHereIsMoney(double b) {
@@ -87,7 +87,7 @@ public class MarketAgent extends Agent implements Market{
 		
 	}
 	public void hack_steak(){
-		v.steak=0;
+		v.steak=4;
 	}
 
 	/**
@@ -126,24 +126,39 @@ public class MarketAgent extends Agent implements Market{
 	private boolean checkorder(item t){
 		if (t.item.equals( "chicken")) {
 			if (v.chicken!=0){
-			v.chicken-=t.unit;
-			t.payment=10.99*t.unit;
-			return true;
+				if(v.chicken>=t.unit){
+					v.chicken-=t.unit;
+					t.payment=10.99*t.unit;
+					return true;			
+				}
+				else{
+					t.payment=10.99*(t.unit-v.chicken);
+					noInventory(t.item,t.unit-v.chicken);
+					return true;
+				}
 			}
 			else
-			return false;
+				return false;
 		}
-			
+
 		if (t.item.equals("steak")){
 			if (v.steak!=0){
-				v.steak-=t.unit;
-				t.payment=15.99*t.unit;
-			return true;
+				if(v.steak>=t.unit){
+					v.steak-=t.unit;
+					t.payment=15.99*t.unit;
+					return true;
+				}
+
+				else{
+					t.payment=10.99*(t.unit-v.steak);
+					noInventory(t.item,t.unit-v.steak);
+					return true;
+				}
+			}
+			else
+				return false;
 		}
-		else
-			return false;
-		}
-			
+
 		if (t.item.equals( "salad")){
 			if (v.salad!=0){
 			v.salad-=t.unit;
@@ -165,8 +180,8 @@ public class MarketAgent extends Agent implements Market{
 		return false;
 	}
 	
-	private void noInventory(String i) {
-		cook.msgNoInventory(i);
+	private void noInventory(String i, int u) {
+		cook.msgNoInventory(i,u);
 		
 	}
 	private void Restock(){

@@ -46,8 +46,8 @@ public abstract void msgHereIsCheck(double c);
 
 public abstract void msgPaying() ;
 	//from animation
-
-public abstract void msgAnimationFinishedLeaveRestaurant() ;
+public abstract void msgGoodbye() ;
+//public abstract void msgAnimationFinishedLeaveRestaurant() ;
 	//from animation
 
 

@@ -52,6 +52,7 @@ class mycustomer {
 	}
 }
 	private String name;
+	public int spot;
 	Timer breaktimer = new Timer();
 	private Semaphore atTable = new Semaphore(0,true);
 	private Semaphore atLobby =new Semaphore(1,true);
@@ -70,6 +71,7 @@ class mycustomer {
 		Menu.put("salad",5.99);
 		Menu.put("pizza",8.99);
 		this.name = name;
+		spot=0;
 		
 	}
 
@@ -94,6 +96,10 @@ class mycustomer {
 	}
 	public void setCashier(CashierAgent c) {
 		this.cashier = c;
+	}
+	public void setSpot(int s) {
+		
+		this.spot = s;
 	}
 	// Messages
 	public void wantsaBreak(){
@@ -500,7 +506,7 @@ Do("delivering check");
 	}
 	c.c.msgHereIsCheck(c.check);
 	Do("customer recieved check");
-	waiterGui.DoLeaveCustomer();
+	waiterGui.Start(spot);
 	customers.remove(c);
 }
 

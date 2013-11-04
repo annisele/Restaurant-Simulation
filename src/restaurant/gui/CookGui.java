@@ -11,7 +11,7 @@ public class CookGui implements Gui {
 
     private int xPos = 370, yPos = 300;//default waiter position
     private int xDestination = 370, yDestination = 300;//default start position
-  
+   private String text=""; 
 
 
     public CookGui(CookAgent agent) {
@@ -35,10 +35,15 @@ public class CookGui implements Gui {
            Cook();
         }
     }
-
+ public void setText(String t){
+	 text=t;
+ }
     public void draw(Graphics2D g) {
         g.setColor(Color.BLUE);
         g.fillRect(xPos, yPos, 20, 20);
+        g.setFont(new Font("Serif", Font.BOLD,12));
+        g.setColor(Color.RED);
+        g.drawString(text, xPos-20, yPos+10);
     }
 
     public boolean isPresent() {

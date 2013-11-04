@@ -133,7 +133,7 @@ public class CashierAgent extends Agent implements Cashier {
 			synchronized(markets){
 	
 			for(int i=0; i<markets.size();i++){
-				Do("asjdhk");
+		
 				if(markets.get(i).m==m){
 		balance-=p;
 		
@@ -148,7 +148,7 @@ public class CashierAgent extends Agent implements Cashier {
 		}
 		
 		pay_market=true;
-		Do("Market has been paid in full.");
+		Do(m.getName()+" has been paid "+markets.get(i).bill+" in full.");
 		stateChanged();
 		}
 			}
@@ -257,9 +257,8 @@ public class CashierAgent extends Agent implements Cashier {
 			}
 			
 			if (o.state == OrderState.paid) {
-				
+				paid(o.cust);
 				cashiers_list.remove(o);
-				
 				return true;
 			}
 			
@@ -292,7 +291,9 @@ public class CashierAgent extends Agent implements Cashier {
 	//stateChanged(
 			}
 		
-	
+	private void paid(Customer c){
+		c.msgGoodbye();
+	}
 	private void sentMoney(Market m, double b){
 		m.msgHereIsMoney(b);
 		pay_market=false;

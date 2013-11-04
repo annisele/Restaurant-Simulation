@@ -56,7 +56,7 @@ public class CustomerGui implements Gui{
 				agent.msgPaying();
 				System.out.println("customer at cashier");
 
-				agent.msgAnimationFinishedLeaveRestaurant();
+				//agent.msgAnimationFinishedLeaveRestaurant();
 				isHungry = false;
 				gui.setCustomerEnabled(agent);
 			}

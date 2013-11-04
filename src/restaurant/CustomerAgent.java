@@ -99,7 +99,7 @@ public class CustomerAgent extends Agent implements Customer {
 		cook.hack_steak();
 	}
 	public void hack_mdebt(){
-		Do("HAHAHAHHK");
+	
 		hack_c=true;
 		cook.hack_chicken();
 		cashier.modBalance(50);
@@ -165,13 +165,20 @@ public class CustomerAgent extends Agent implements Customer {
 		
 		stateChanged();
 	}
-	public void msgAnimationFinishedLeaveRestaurant() {
+	public void msgGoodbye() {
+		Do("Goodbye");
+		event = AgentEvent.doneLeaving;
+		stateChanged();
+		
+	}
+	
+	/*public void msgAnimationFinishedLeaveRestaurant() {
 		//from animation
 		event = AgentEvent.doneLeaving;
 		stateChanged();
 		Do("Has left restuarant");
 	}
-	
+	*/
 	
 	/**
 	 * Scheduler.  Determine what action is called for, and do it.
@@ -290,7 +297,7 @@ public class CustomerAgent extends Agent implements Customer {
 				}
 			}
 			}
-		//send our instance, so he can respond to us
+	
 		}
 		//Do(""+host.waitingSpots.entrySet());
 		else{

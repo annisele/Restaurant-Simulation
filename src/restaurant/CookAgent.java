@@ -158,10 +158,10 @@ public class CookAgent extends Agent {
 		}
 			
 	}
-	public void msgNoInventory(String item){
+	public void msgNoInventory(String item, int num){
 		Do("Recieved msg market out of item");
 		c_market++;
-		callMarket(item);
+		callMarket(item, num);
 	}
 	/**
 	 * Scheduler.  Determine what action is called for, and do it.
@@ -208,13 +208,13 @@ public class CookAgent extends Agent {
 			v.chicken--;
 				if(v.chicken<=5){
 					v.chicken_low=true;
-					callMarket(c);
+					callMarket(c,num_items);
 					Do("order chicken !!!!");
 				}
 			return true;
 			}
 			else{
-				callMarket(c);
+				callMarket(c,num_items);
 			return false;
 			}
 		}
@@ -224,12 +224,12 @@ public class CookAgent extends Agent {
 			v.steak--;
 			if(v.steak<=5){
 				v.steak_low=true;
-				callMarket(c);
+				callMarket(c,num_items);
 			}
 			return true;
 		}
 		else{
-			callMarket(c);
+			callMarket(c,num_items);
 			return false;
 		}
 		}
@@ -239,12 +239,12 @@ public class CookAgent extends Agent {
 			v.salad--;
 			if(v.salad<=5){
 				v.salad_low=true;
-				callMarket(c);
+				callMarket(c,num_items);
 			}
 			return true;
 		}
 		else{
-			callMarket(c);
+			callMarket(c,num_items);
 			return false;
 		}
 		}
@@ -253,13 +253,13 @@ public class CookAgent extends Agent {
 			v.pizza--;
 			if(v.pizza<=5){
 				v.pizza_low=true;
-				callMarket(c);
+				callMarket(c,num_items);
 			}
 			return true;
 		}
 		else
 		{
-			callMarket(c);
+			callMarket(c,num_items);
 			return false;
 		}
 		}
@@ -275,6 +275,7 @@ public class CookAgent extends Agent {
 	private void CookIt(order o){
 		Do(""+o.choice);
 		cookGui.Prep();
+		cookGui.setText(o.choice);
 		num=find(o);
 		timer.schedule(new TimerTask(){
 			Object cookie = 1;
@@ -303,6 +304,7 @@ public class CookAgent extends Agent {
 		cookGui.Plate();
 		setWaiter(o.w);
 		Do("done plating");
+		cookGui.setText("");
 		waiter.msgFoodReady(o.table);
 		orders.remove(o);
 		
@@ -342,10 +344,10 @@ public class CookAgent extends Agent {
 			v.pizza_gone=false;
 		}
 	}
-	private void callMarket(String item){
+	private void callMarket(String item, int n){
 		Do("ordering from market "+c_market);
 	
-		markets.get(c_market).msgLowOnItem(this, item, num_items);
+		markets.get(c_market).msgLowOnItem(this, item, n);
 		
 	}
 	
