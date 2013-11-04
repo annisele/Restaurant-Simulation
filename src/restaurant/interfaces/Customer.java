@@ -19,7 +19,7 @@ public interface Customer {
 	
 public abstract void hack_chicken();
 	
-
+public abstract void hack_mdebt();
 public abstract void hack_salad();
 
 public abstract void hack_steak();

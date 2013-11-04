@@ -80,7 +80,12 @@ public class MarketAgent extends Agent implements Market{
 			noInventory(food);
 			temp=null;
 	}
-
+	public void msgHereIsMoney(double b) {
+		Do("Recieved money from cashier!");
+		status=OrderStatus.finished;
+		stateChanged();
+		
+	}
 	public void hack_steak(){
 		v.steak=0;
 	}
@@ -103,9 +108,6 @@ public class MarketAgent extends Agent implements Market{
 				
 				public void run() {
 					Restock();
-					Do("restocked");
-					
-					Do(""+status);
 					
 				}
 			}, 1000);
@@ -183,6 +185,7 @@ public class MarketAgent extends Agent implements Market{
 		this.cashier=cash2;
 		
 	}
+	
 	
 }
 	// The animation DoXYZ() routines

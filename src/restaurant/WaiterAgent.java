@@ -201,11 +201,10 @@ class mycustomer {
 		Do("Recieved msg cust is ready to pay");
 		
 		for (int i = 0; i< customers.size();i++){
-			Do("..");
+		
 			if(customers.get(i).c==c){
-				Do("here");
+		
 				customers.get(i).state=CustomerState.waitingtopay;
-				Do("here"+customers.get(i).state);
 				stateChanged();
 				//break;
 			}
@@ -351,7 +350,7 @@ class mycustomer {
 				}
 				//Do("");
 				if(c.state == CustomerState.waitingtopay){
-					Do("HERE");
+					
 						DeliverCheck(c);
 						c.state=CustomerState.finished;
 						return true;

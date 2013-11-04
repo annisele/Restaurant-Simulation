@@ -98,6 +98,12 @@ public class CustomerAgent extends Agent implements Customer {
 		hack_st=true;
 		cook.hack_steak();
 	}
+	public void hack_mdebt(){
+		Do("HAHAHAHHK");
+		hack_c=true;
+		cook.hack_chicken();
+		cashier.modBalance(50);
+	}
 	public String getCustomerName() {
 		return name;
 	}
@@ -257,7 +263,6 @@ public class CustomerAgent extends Agent implements Customer {
 		}
 		if (state == AgentState.Leaving && event == AgentEvent.Leaving){
 			state = AgentState.DoingNothing;
-			Do("here");
 			AtCashiers();
 			return true;
 		}
@@ -433,9 +438,11 @@ public class CustomerAgent extends Agent implements Customer {
 	}
 	private void AtCashiers(){
 		Do("At cashiers");
-		cashmoney-=waiter.Menu.get(this.choice);
+		Do(""+waiter.Menu.entrySet());
+		cashmoney-=waiter.Menu.get(choice);
 		cashier.msgHereIsMoney(this, customer_check);
 		cashmoney-=customer_check;
+		//Do("$: "+cashmoney);
 		host.msgLeavingTable(this);
 		
 	}

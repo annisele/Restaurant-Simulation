@@ -8,6 +8,8 @@ import restaurant.gui.HostGui;
 import restaurant.interfaces.*;
 import restaurant.test.mock.LoggedEvent;
 
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
@@ -23,20 +25,22 @@ public class CashierAgent extends Agent implements Cashier {
 	
 	private WaiterAgent wait;
 	private CustomerAgent cust;
-	public int balance;
+	public double balance;
 	public List<mymarket> markets
 	= Collections.synchronizedList(new ArrayList<mymarket>());
-	private class mymarket{
-		MarketAgent m;
-		String name;
+	public class mymarket{
+		public double bill=0;
+		Market m;
+		public String name;
 		double debt=0;
 		
-		mymarket(MarketAgent market){
+		mymarket(Market market){
 			m =market;
 			name= market.getName();
 		}
 	}
 	private boolean in_debt=false;
+	private boolean pay_market=false;
 	public List<order> cashiers_list
 	= Collections.synchronizedList(new LinkedList<order>());
 	public List<order> bad_orders
@@ -77,12 +81,16 @@ public class CashierAgent extends Agent implements Cashier {
 	
 	public CashierAgent(){
 		super();
-		balance=10;
+		balance=1000;
 		Menu.put("chicken",10.99);	
 		Menu.put("steak",15.99);
 		Menu.put("salad",5.99);
 		Menu.put("pizza",8.99);
 		
+	}
+	public void modBalance(double b){
+		balance=b;
+		Do(""+balance);
 	}
 	/*
 	@Override
@@ -115,21 +123,58 @@ public class CashierAgent extends Agent implements Cashier {
 	}
 	
 	@Override
-	public void msgHereIsBill(Market m,Double p){
+	public void msgHereIsBill(Market m, Double p){
+		double temp=0;
+		
 		Do("Recieved bill from market");
 		log.add(new LoggedEvent("Recieved bill"));
 		if(balance>=p){
+
+			synchronized(markets){
+	
+			for(int i=0; i<markets.size();i++){
+				Do("asjdhk");
+				if(markets.get(i).m==m){
 		balance-=p;
+		
+		temp=p;
+		DecimalFormat fr =new DecimalFormat("##.00");
+		String formate=fr.format(temp);
+		try {
+			markets.get(i).bill=(Double)fr.parse(formate);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		pay_market=true;
 		Do("Market has been paid in full.");
-		log.add(new LoggedEvent("Market has been paid in full"));
+		stateChanged();
+		}
+			}
+			}
 		}
 		else{
-			balance=0;
+
 			synchronized(markets){
-			for(int i=0; i<markets.size();i++){
-				if(markets.get(i).m==m){
-			markets.get(i).debt= p-balance;
-			Do("Casier owes $"+markets.get(i).debt);
+			for(int j=0; j<markets.size();j++){
+				if(markets.get(j).m==m){
+					Do(""+balance);
+					temp= p-balance;
+					DecimalFormat f =new DecimalFormat("##.00");
+					String formate=f.format(temp);
+					try {
+						markets.get(j).bill=(Double)f.parse(formate);
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					markets.get(j).debt= markets.get(j).bill;
+			Do("Cashier is in debt!");
+			Do("Cashier owes $"+markets.get(j).debt);
+			balance=0;
+			in_debt=true;
+			stateChanged();
 			}
 			}
 			}
@@ -147,6 +192,7 @@ public class CashierAgent extends Agent implements Cashier {
 				if(current.payment==m){
 					current.state= OrderState.paid;
 					balance+=m;
+					Do("Customer has paid in full");
 					stateChanged();
 				}
 				else{
@@ -172,6 +218,17 @@ public class CashierAgent extends Agent implements Cashier {
             so that table is unoccupied and customer is waiting.
             If so seat him at the table.
 		 */
+		if(pay_market==true){
+			
+			synchronized(markets){
+			for(int i=0; i<markets.size();i++){
+				if(markets.get(i).bill>0){
+		sentMoney(markets.get(i).m,markets.get(i).bill);
+		return true;
+		}
+		}
+		}
+		}
 		if(in_debt==true){
 			synchronized(markets){
 		for(mymarket m: markets){
@@ -179,6 +236,12 @@ public class CashierAgent extends Agent implements Cashier {
 				if(balance>m.debt){
 					balance-=m.debt;
 					Do("$"+m.debt+" has been paid to "+m.name);
+					in_debt=false;
+					pay_market=true;
+					return true;
+				}
+				if(balance<=m.debt){
+					//Do("$$");
 				}
 			}
 			}
@@ -194,8 +257,9 @@ public class CashierAgent extends Agent implements Cashier {
 			}
 			
 			if (o.state == OrderState.paid) {
-				Do("Customer has paid in full");
+				
 				cashiers_list.remove(o);
+				
 				return true;
 			}
 			
@@ -229,7 +293,10 @@ public class CashierAgent extends Agent implements Cashier {
 			}
 		
 	
-	
+	private void sentMoney(Market m, double b){
+		m.msgHereIsMoney(b);
+		pay_market=false;
+	}
 	private void KeepTrack(order o){
 		bad_orders.add(o);
 		
@@ -247,9 +314,13 @@ public class CashierAgent extends Agent implements Cashier {
 
 	//utilities
 	
-	public void addMarket(MarketAgent m){
+	public void addMarket(Market m){
 		mymarket temp= new mymarket(m);
 		markets.add(temp);
+	}
+	
+	public void printMarket() {
+		System.out.println("her "+ markets.size());
 	}
 	
 		

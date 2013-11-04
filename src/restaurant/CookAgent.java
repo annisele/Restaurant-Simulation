@@ -97,6 +97,7 @@ public class CookAgent extends Agent {
 	}
 	public void hack_chicken(){
 		v.chicken=0;
+		num_items=5;
 	}
 	public void hack_salad(){
 		v.salad=0;
