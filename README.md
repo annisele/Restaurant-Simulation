@@ -13,4 +13,5 @@
 
 ###type in "chicken" to see reorder function. first item is out of stock, menu is updated and customer reorders
 ###"salad" to see customer leaving after only having enough money to order cheapest item, but item ran out of stock.
-###"steak" to see customer order a out of stock item, cook calls out of stock market, calls a second maket.
+###"steak" to see customer order an unavailable item, cook calls out of stock market, calls a second market. cashier is billed by two markets
+###"market" to see cashier in debt. cashier agent keeps track of debt and pays back in full when it raises enough revenue
