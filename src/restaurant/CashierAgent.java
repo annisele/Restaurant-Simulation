@@ -32,7 +32,7 @@ public class CashierAgent extends Agent implements Cashier {
 		public double bill=0;
 		Market m;
 		public String name;
-		double debt=0;
+		public double debt=0;
 		
 		mymarket(Market market){
 			m =market;
@@ -81,7 +81,7 @@ public class CashierAgent extends Agent implements Cashier {
 	
 	public CashierAgent(){
 		super();
-		balance=1000;
+		balance=500;
 		Menu.put("chicken",10.99);	
 		Menu.put("steak",15.99);
 		Menu.put("salad",5.99);
@@ -265,8 +265,6 @@ public class CashierAgent extends Agent implements Cashier {
 			if (o.state == OrderState.indebt) {
 				
 				KeepTrack(o);
-				Do("Customer "+ o.cust+ "is in debt");
-				
 				return true;
 			}
 		}
@@ -300,6 +298,7 @@ public class CashierAgent extends Agent implements Cashier {
 	}
 	private void KeepTrack(order o){
 		bad_orders.add(o);
+		Do("Customer "+ o.cust+ "is in debt");
 		
 	}
 
